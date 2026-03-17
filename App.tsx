@@ -1,20 +1,72 @@
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-export default function App() {
+import { TasksProvider } from './src/context/TasksContext';
+import TodayScreen from './src/screens/TodayScreen';
+import AllTasksScreen from './src/screens/AllTasksScreen';
+import CalendarScreen from './src/screens/CalendarScreen';
+import MoodScreen from './src/screens/MoodScreen';
+import AddTaskScreen from './src/screens/AddTaskScreen';
+import EditTaskScreen from './src/screens/EditTaskScreen';
+
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+function TabIcon({ label, focused }: { label: string; focused: boolean }) {
+  const icons: Record<string, string> = {
+    Today: '☀️',
+    Tasks: '✅',
+    Calendar: '📅',
+    Mood: '😊',
+  };
+  return <Text style={{ fontSize: 20 }}>{icons[label] ?? '•'}</Text>;
+}
+
+function MainTabs() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerStyle: { backgroundColor: '#1a237e' },
+        headerTintColor: '#fff',
+        headerTitleStyle: { fontWeight: '700' },
+        tabBarStyle: { backgroundColor: '#fff', borderTopColor: '#e8eaf6' },
+        tabBarActiveTintColor: '#1a237e',
+        tabBarInactiveTintColor: '#9e9e9e',
+        tabBarIcon: ({ focused }) => <TabIcon label={route.name} focused={focused} />,
+      })}
+    >
+      <Tab.Screen name="Today" component={TodayScreen} />
+      <Tab.Screen name="Tasks" component={AllTasksScreen} />
+      <Tab.Screen name="Calendar" component={CalendarScreen} />
+      <Tab.Screen name="Mood" component={MoodScreen} />
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+    <TasksProvider>
+      <NavigationContainer>
+        <StatusBar style="light" />
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: { backgroundColor: '#1a237e' },
+            headerTintColor: '#fff',
+            headerTitleStyle: { fontWeight: '700' },
+          }}
+        >
+          <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+          <Stack.Screen name="AddTask" component={AddTaskScreen} options={{ title: 'New Task' }} />
+          <Stack.Screen name="EditTask" component={EditTaskScreen} options={{ title: 'Edit Task' }} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </TasksProvider>
+    </GestureHandlerRootView>
+  );
+}
