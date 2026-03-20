@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Task, MoodEntry } from '../types';
-import { loadTasks, saveTasks } from '../storage/tasks';
+import { loadTasks } from '../storage/tasks';
 import { loadMoodEntries, saveMoodEntry } from '../storage/mood';
 
 interface TasksContextValue {
   tasks: Task[];
   moodEntries: MoodEntry[];
+  // Updates in-memory state only. Callers are responsible for persisting to
+  // storage before calling this (e.g. via addTask/updateTask/deleteTask from
+  // storage/tasks). This prevents a double-write to AsyncStorage.
   setTasks: (tasks: Task[]) => void;
   reloadTasks: () => Promise<void>;
   upsertMood: (entry: MoodEntry) => Promise<void>;
@@ -33,9 +36,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     reloadTasks();
   }, []);
 
-  const setTasks = async (updated: Task[]) => {
+  // Only syncs in-memory state — storage is already written by the caller.
+  const setTasks = (updated: Task[]) => {
     setTasksState(updated);
-    await saveTasks(updated);
   };
 
   const upsertMood = async (entry: MoodEntry) => {

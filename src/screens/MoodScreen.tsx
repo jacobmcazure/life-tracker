@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -41,12 +41,24 @@ export default function MoodScreen() {
   const { moodEntries, upsertMood } = useTasks();
   const today = todayKey();
 
-  const todayEntry = moodEntries.find((e) => e.date === today);
-  const [selectedMood, setSelectedMood] = useState<MoodLevel | null>(
-    (todayEntry?.mood as MoodLevel) ?? null
-  );
-  const [note, setNote] = useState(todayEntry?.note ?? '');
-  const [saved, setSaved] = useState(!!todayEntry);
+  const [selectedMood, setSelectedMood] = useState<MoodLevel | null>(null);
+  const [note, setNote] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  // Track whether the user has made any manual edits this session.
+  // If they haven't, we sync local state whenever moodEntries loads/changes
+  // (context hydrates from AsyncStorage asynchronously after first render).
+  const userEdited = useRef(false);
+
+  useEffect(() => {
+    if (userEdited.current) return;
+    const todayEntry = moodEntries.find((e) => e.date === today);
+    if (todayEntry) {
+      setSelectedMood((todayEntry.mood as MoodLevel) ?? null);
+      setNote(todayEntry.note ?? '');
+      setSaved(true);
+    }
+  }, [moodEntries]);
 
   const handleSave = async () => {
     if (!selectedMood) return;
@@ -74,7 +86,7 @@ export default function MoodScreen() {
                 styles.moodBtn,
                 selectedMood === level && { backgroundColor: MOOD_COLORS[level] },
               ]}
-              onPress={() => { setSelectedMood(level); setSaved(false); }}
+              onPress={() => { userEdited.current = true; setSelectedMood(level); setSaved(false); }}
             >
               <Text style={styles.moodEmoji}>{MOOD_EMOJI[level]}</Text>
               <Text style={[styles.moodLabel, selectedMood === level && styles.moodLabelActive]}>
@@ -91,7 +103,7 @@ export default function MoodScreen() {
           placeholderTextColor="#aaa"
           multiline
           value={note}
-          onChangeText={(t) => { setNote(t); setSaved(false); }}
+          onChangeText={(t) => { userEdited.current = true; setNote(t); setSaved(false); }}
         />
 
         <TouchableOpacity

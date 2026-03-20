@@ -1,23 +1,8 @@
-import { format, parseISO, isToday, isThisWeek, isThisMonth } from 'date-fns';
-import { Task, TaskFrequency } from '../types';
+import { format } from 'date-fns';
+import { Task } from '../types';
 
 export function todayKey(): string {
   return format(new Date(), 'yyyy-MM-dd');
-}
-
-export function isTaskActiveToday(task: Task): boolean {
-  switch (task.frequency) {
-    case 'daily':
-      return true;
-    case 'weekly':
-      return isThisWeek(new Date(), { weekStartsOn: 1 });
-    case 'monthly':
-      return isThisMonth(new Date());
-    case 'longterm':
-      return true;
-    default:
-      return false;
-  }
 }
 
 export function calcCompletionDate(task: Task): string | null {

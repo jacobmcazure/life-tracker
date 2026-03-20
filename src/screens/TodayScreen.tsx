@@ -21,7 +21,7 @@ const PRIORITY_COLOR: Record<string, string> = {
 };
 
 export default function TodayScreen() {
-  const { tasks, setTasks, reloadTasks } = useTasks();
+  const { tasks, setTasks } = useTasks();
   const navigation = useNavigation<any>();
   const today = todayKey();
 

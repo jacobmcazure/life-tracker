@@ -31,3 +31,28 @@ export interface MoodEntry {
   mood: MoodLevel;
   note?: string;
 }
+
+// Daily Scheduler
+export interface TimeBlock {
+  id: string;
+  startTime: string; // 'HH:mm' 24h
+  endTime: string;   // 'HH:mm' 24h
+  activity: string;
+  color?: string;    // optional accent color hex
+}
+
+export interface ScheduleTemplate {
+  id: string;
+  name: string;
+  blocks: TimeBlock[];
+  createdAt: string; // ISO datetime string
+}
+
+// Maps a day-of-week (0=Sun … 6=Sat) or a specific date (YYYY-MM-DD) to a template id.
+// Specific dates take priority over day-of-week defaults.
+export interface DayAssignment {
+  // day-of-week defaults: key is '0'…'6'
+  weekdays: Record<string, string>; // dow string -> templateId
+  // specific date overrides: key is 'YYYY-MM-DD'
+  dates: Record<string, string>;    // dateKey -> templateId
+}
