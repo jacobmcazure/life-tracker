@@ -7,16 +7,21 @@ const SETTINGS_KEY = '@life_tracker_settings';
 const DEFAULT_SETTINGS: UserSettings = {
   displayName: '',
   dateJoined: format(new Date(), 'yyyy-MM-dd'),
-  theme: 'light',
+  activeThemeId: 'light',
 };
 
 export async function loadSettings(): Promise<UserSettings> {
   try {
     const raw = await AsyncStorage.getItem(SETTINGS_KEY);
     if (raw) {
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+      const parsed = JSON.parse(raw);
+      // Backward compat: migrate old 'theme' field to 'activeThemeId'
+      if (parsed.theme && !parsed.activeThemeId) {
+        parsed.activeThemeId = parsed.theme;
+        delete parsed.theme;
+      }
+      return { ...DEFAULT_SETTINGS, ...parsed };
     }
-    // First launch: persist defaults so dateJoined is locked in
     await saveSettings(DEFAULT_SETTINGS);
     return DEFAULT_SETTINGS;
   } catch {

@@ -1,28 +1,27 @@
-export type TaskFrequency = 'daily' | 'weekly' | 'monthly' | 'longterm';
-export type TaskPriority = 'low' | 'medium' | 'high';
-export type LongtermStatus = 'not_started' | 'in_progress' | 'completed' | 'paused';
+// ── Theme ─────────────────────────────────────────────────────────────────────
 
-export interface Task {
-  id: string;
-  title: string;
-  frequency: TaskFrequency;
-  priority: TaskPriority;
-  createdAt: string; // ISO date string
-
-  // For daily/weekly/monthly tasks
-  completions: Record<string, boolean>; // key: YYYY-MM-DD, value: done
-
-  // For tasks with a numeric goal (e.g. read 300 pages, 10 pages/day)
-  totalAmount?: number;
-  dailyGoalAmount?: number;
-  unit?: string; // e.g. "pages", "minutes"
-
-  // For long-term tasks
-  longtermStatus?: LongtermStatus;
-  dueDate?: string; // ISO date string (manually set or auto-calculated)
-
-  notes?: string;
+export interface ThemeColors {
+  bg: string;
+  card: string;
+  text: string;
+  muted: string;
+  primary: string;
+  headerBg: string;
+  headerText: string;
+  border: string;
+  inputBg: string;
+  accent: string;
+  dangerBg: string;
+  dangerText: string;
 }
+
+export interface Theme {
+  id: string;
+  name: string;
+  colors: ThemeColors;
+}
+
+// ── Mood ──────────────────────────────────────────────────────────────────────
 
 export type MoodLevel = 1 | 2 | 3 | 4 | 5;
 
@@ -32,7 +31,8 @@ export interface MoodEntry {
   note?: string;
 }
 
-// Daily Scheduler
+// ── Daily Scheduler ───────────────────────────────────────────────────────────
+
 export interface TimeBlock {
   id: string;
   startTime: string; // 'HH:mm' 24h
@@ -51,17 +51,28 @@ export interface ScheduleTemplate {
 // Maps a day-of-week (0=Sun … 6=Sat) or a specific date (YYYY-MM-DD) to a template id.
 // Specific dates take priority over day-of-week defaults.
 export interface DayAssignment {
-  // day-of-week defaults: key is '0'…'6'
   weekdays: Record<string, string>; // dow string -> templateId
-  // specific date overrides: key is 'YYYY-MM-DD'
   dates: Record<string, string>;    // dateKey -> templateId
 }
 
-// Settings
-export type ThemeMode = 'light' | 'dark';
+// ── Block Completions ─────────────────────────────────────────────────────────
+
+// Outer key: date string 'YYYY-MM-DD'
+// Inner key: TimeBlock id
+// Value: true if completed
+export type BlockCompletions = Record<string, Record<string, boolean>>;
+
+// ── Day Notes (Journal) ───────────────────────────────────────────────────────
+
+export interface DayNote {
+  date: string; // YYYY-MM-DD
+  text: string;
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────────
 
 export interface UserSettings {
   displayName: string;
-  dateJoined: string;    // ISO date string, set once on first launch
-  theme: ThemeMode;
+  dateJoined: string;       // ISO date string, set once on first launch
+  activeThemeId: string;    // references a Theme.id (e.g. 'light', 'dark')
 }

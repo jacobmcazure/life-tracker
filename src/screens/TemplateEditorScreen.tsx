@@ -12,7 +12,9 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useScheduler } from '../context/SchedulerContext';
+import { useTheme } from '../context/SettingsContext';
 import { addTemplate, updateTemplate } from '../storage/scheduler';
+import { formatTime } from '../utils/dates';
 import { ScheduleTemplate, TimeBlock } from '../types';
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -23,14 +25,6 @@ function uid(): string {
 
 function pad(n: number): string {
   return String(n).padStart(2, '0');
-}
-
-function formatTime(hhmm: string): string {
-  const [hStr, mStr] = hhmm.split(':');
-  const h = parseInt(hStr, 10);
-  const period = h >= 12 ? 'pm' : 'am';
-  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
-  return `${h12}:${mStr}${period}`;
 }
 
 function timeToMinutes(hhmm: string): number {
@@ -55,6 +49,7 @@ interface TimePickerModalProps {
 }
 
 function TimePickerModal({ visible, value, label, onConfirm, onCancel }: TimePickerModalProps) {
+  const { colors } = useTheme();
   const [hour, setHour] = useState(() => parseInt(value.split(':')[0], 10));
   const [minute, setMinute] = useState(() => parseInt(value.split(':')[1], 10));
   const [period, setPeriod] = useState<'am' | 'pm'>(() => (parseInt(value.split(':')[0], 10) >= 12 ? 'pm' : 'am'));
@@ -95,56 +90,56 @@ function TimePickerModal({ visible, value, label, onConfirm, onCancel }: TimePic
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <View style={tp.overlay}>
-        <View style={tp.sheet}>
-          <Text style={tp.title}>{label}</Text>
+        <View style={[tp.sheet, { backgroundColor: colors.card }]}>
+          <Text style={[tp.title, { color: colors.primary }]}>{label}</Text>
           <View style={tp.pickerRow}>
             {/* Hour */}
             <View style={tp.spinnerCol}>
               <TouchableOpacity style={tp.arrowBtn} onPress={() => adjustHour(1)}>
-                <Text style={tp.arrow}>▲</Text>
+                <Text style={[tp.arrow, { color: colors.primary }]}>▲</Text>
               </TouchableOpacity>
-              <Text style={tp.timeValue}>{pad(hour)}</Text>
+              <Text style={[tp.timeValue, { color: colors.text }]}>{pad(hour)}</Text>
               <TouchableOpacity style={tp.arrowBtn} onPress={() => adjustHour(-1)}>
-                <Text style={tp.arrow}>▼</Text>
+                <Text style={[tp.arrow, { color: colors.primary }]}>▼</Text>
               </TouchableOpacity>
             </View>
 
-            <Text style={tp.colon}>:</Text>
+            <Text style={[tp.colon, { color: colors.muted }]}>:</Text>
 
             {/* Minute */}
             <View style={tp.spinnerCol}>
               <TouchableOpacity style={tp.arrowBtn} onPress={() => adjustMinute(5)}>
-                <Text style={tp.arrow}>▲</Text>
+                <Text style={[tp.arrow, { color: colors.primary }]}>▲</Text>
               </TouchableOpacity>
-              <Text style={tp.timeValue}>{pad(minute)}</Text>
+              <Text style={[tp.timeValue, { color: colors.text }]}>{pad(minute)}</Text>
               <TouchableOpacity style={tp.arrowBtn} onPress={() => adjustMinute(-5)}>
-                <Text style={tp.arrow}>▼</Text>
+                <Text style={[tp.arrow, { color: colors.primary }]}>▼</Text>
               </TouchableOpacity>
             </View>
 
             {/* AM/PM */}
             <View style={tp.periodCol}>
               <TouchableOpacity
-                style={[tp.periodBtn, period === 'am' && tp.periodBtnActive]}
+                style={[tp.periodBtn, { backgroundColor: colors.inputBg, borderColor: colors.border }, period === 'am' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 onPress={() => setPeriod('am')}
               >
-                <Text style={[tp.periodText, period === 'am' && tp.periodTextActive]}>AM</Text>
+                <Text style={[tp.periodText, { color: colors.muted }, period === 'am' && { color: colors.headerText }]}>AM</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[tp.periodBtn, period === 'pm' && tp.periodBtnActive]}
+                style={[tp.periodBtn, { backgroundColor: colors.inputBg, borderColor: colors.border }, period === 'pm' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 onPress={() => setPeriod('pm')}
               >
-                <Text style={[tp.periodText, period === 'pm' && tp.periodTextActive]}>PM</Text>
+                <Text style={[tp.periodText, { color: colors.muted }, period === 'pm' && { color: colors.headerText }]}>PM</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           <View style={tp.btnRow}>
-            <TouchableOpacity style={tp.cancelBtn} onPress={onCancel}>
-              <Text style={tp.cancelText}>Cancel</Text>
+            <TouchableOpacity style={[tp.cancelBtn, { backgroundColor: colors.inputBg }]} onPress={onCancel}>
+              <Text style={[tp.cancelText, { color: colors.muted }]}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={tp.confirmBtn} onPress={handleConfirm}>
-              <Text style={tp.confirmText}>Set Time</Text>
+            <TouchableOpacity style={[tp.confirmBtn, { backgroundColor: colors.primary }]} onPress={handleConfirm}>
+              <Text style={[tp.confirmText, { color: colors.headerText }]}>Set Time</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -164,6 +159,7 @@ export default function TemplateEditorScreen() {
   const route = useRoute<any>();
   const { template } = (route.params ?? {}) as RouteParams;
   const { setTemplates } = useScheduler();
+  const { colors } = useTheme();
 
   const isEditing = !!template;
 
@@ -278,41 +274,41 @@ export default function TemplateEditorScreen() {
   const sortedBlocks = [...blocks].sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
 
         {/* Template Name */}
-        <Text style={styles.fieldLabel}>Template Name</Text>
+        <Text style={[styles.fieldLabel, { color: colors.primary }]}>Template Name</Text>
         <TextInput
-          style={styles.nameInput}
+          style={[styles.nameInput, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
           placeholder="e.g. Weekday, Weekend, Rest Day…"
-          placeholderTextColor="#aaa"
+          placeholderTextColor={colors.muted}
           value={name}
           onChangeText={setName}
           maxLength={40}
         />
 
         {/* Blocks */}
-        <Text style={styles.fieldLabel}>Time Blocks</Text>
+        <Text style={[styles.fieldLabel, { color: colors.primary }]}>Time Blocks</Text>
         {sortedBlocks.length === 0 && (
-          <Text style={styles.emptyHint}>No blocks yet. Tap "Add Block" to get started.</Text>
+          <Text style={[styles.emptyHint, { color: colors.muted }]}>No blocks yet. Tap "Add Block" to get started.</Text>
         )}
 
         {sortedBlocks.map((block, index) => (
-          <View key={block.id} style={styles.blockCard}>
+          <View key={block.id} style={[styles.blockCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.blockHeader}>
-              <Text style={styles.blockIndex}>Block {index + 1}</Text>
+              <Text style={[styles.blockIndex, { color: colors.primary }]}>Block {index + 1}</Text>
               <TouchableOpacity onPress={() => removeBlock(block.id)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Text style={styles.removeText}>Remove</Text>
+                <Text style={[styles.removeText, { color: colors.dangerText }]}>Remove</Text>
               </TouchableOpacity>
             </View>
 
             {/* Activity */}
-            <Text style={styles.subLabel}>Activity</Text>
+            <Text style={[styles.subLabel, { color: colors.muted }]}>Activity</Text>
             <TextInput
-              style={styles.activityInput}
+              style={[styles.activityInput, { backgroundColor: colors.inputBg, color: colors.text, borderColor: colors.border }]}
               placeholder="e.g. Walk Dogs, Study, Gym…"
-              placeholderTextColor="#aaa"
+              placeholderTextColor={colors.muted}
               value={block.activity}
               onChangeText={(t) => updateBlock(block.id, { activity: t })}
               maxLength={60}
@@ -321,27 +317,27 @@ export default function TemplateEditorScreen() {
             {/* Time range */}
             <View style={styles.timeRow}>
               <View style={styles.timeField}>
-                <Text style={styles.subLabel}>Start</Text>
+                <Text style={[styles.subLabel, { color: colors.muted }]}>Start</Text>
                 <TouchableOpacity
-                  style={styles.timeBtn}
+                  style={[styles.timeBtn, { backgroundColor: colors.bg, borderColor: colors.border }]}
                   onPress={() => openTimePicker(block.id, 'startTime')}
                 >
-                  <Text style={styles.timeBtnText}>{formatTime(block.startTime)}</Text>
+                  <Text style={[styles.timeBtnText, { color: colors.primary }]}>{formatTime(block.startTime)}</Text>
                 </TouchableOpacity>
               </View>
-              <Text style={styles.timeDash}>–</Text>
+              <Text style={[styles.timeDash, { color: colors.muted }]}>–</Text>
               <View style={styles.timeField}>
-                <Text style={styles.subLabel}>End</Text>
+                <Text style={[styles.subLabel, { color: colors.muted }]}>End</Text>
                 <TouchableOpacity
-                  style={styles.timeBtn}
+                  style={[styles.timeBtn, { backgroundColor: colors.bg, borderColor: colors.border }]}
                   onPress={() => openTimePicker(block.id, 'endTime')}
                 >
-                  <Text style={styles.timeBtnText}>{formatTime(block.endTime)}</Text>
+                  <Text style={[styles.timeBtnText, { color: colors.primary }]}>{formatTime(block.endTime)}</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.durationBox}>
-                <Text style={styles.durationLabel}>Duration</Text>
-                <Text style={styles.durationValue}>
+                <Text style={[styles.durationLabel, { color: colors.muted }]}>Duration</Text>
+                <Text style={[styles.durationValue, { color: colors.muted }]}>
                   {(() => {
                     const diff = timeToMinutes(block.endTime) - timeToMinutes(block.startTime);
                     if (diff <= 0) return '—';
@@ -355,12 +351,12 @@ export default function TemplateEditorScreen() {
           </View>
         ))}
 
-        <TouchableOpacity style={styles.addBlockBtn} onPress={addBlock}>
-          <Text style={styles.addBlockBtnText}>+ Add Block</Text>
+        <TouchableOpacity style={[styles.addBlockBtn, { borderColor: colors.border }]} onPress={addBlock}>
+          <Text style={[styles.addBlockBtnText, { color: colors.primary }]}>+ Add Block</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-          <Text style={styles.saveBtnText}>{isEditing ? 'Save Changes' : 'Create Template'}</Text>
+        <TouchableOpacity style={[styles.saveBtn, { backgroundColor: colors.primary }]} onPress={handleSave}>
+          <Text style={[styles.saveBtnText, { color: colors.headerText }]}>{isEditing ? 'Save Changes' : 'Create Template'}</Text>
         </TouchableOpacity>
 
         <View style={{ height: 40 }} />
@@ -381,37 +377,31 @@ export default function TemplateEditorScreen() {
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0f4f8' },
+  container: { flex: 1 },
   scroll: { padding: 16, paddingBottom: 60 },
 
   fieldLabel: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#1a237e',
     textTransform: 'uppercase',
     letterSpacing: 0.6,
     marginBottom: 6,
     marginTop: 16,
   },
   nameInput: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 14,
     fontSize: 16,
-    color: '#222',
     borderWidth: 1,
-    borderColor: '#dde3f0',
   },
 
-  emptyHint: { fontSize: 13, color: '#aaa', textAlign: 'center', marginTop: 8, marginBottom: 4 },
+  emptyHint: { fontSize: 13, textAlign: 'center', marginTop: 8, marginBottom: 4 },
 
   blockCard: {
-    backgroundColor: '#fff',
     borderRadius: 14,
     padding: 14,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#dde3f0',
     elevation: 1,
     shadowColor: '#000',
     shadowOpacity: 0.04,
@@ -424,40 +414,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  blockIndex: { fontSize: 13, fontWeight: '700', color: '#1a237e', textTransform: 'uppercase', letterSpacing: 0.5 },
-  removeText: { fontSize: 12, color: '#e53935', fontWeight: '600' },
+  blockIndex: { fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
+  removeText: { fontSize: 12, fontWeight: '600' },
 
-  subLabel: { fontSize: 11, fontWeight: '700', color: '#888', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 4 },
+  subLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 4 },
   activityInput: {
-    backgroundColor: '#f8f9ff',
     borderRadius: 8,
     padding: 10,
     fontSize: 15,
-    color: '#222',
     borderWidth: 1,
-    borderColor: '#e8eaf6',
     marginBottom: 12,
   },
 
   timeRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
   timeField: { flex: 1 },
   timeBtn: {
-    backgroundColor: '#f0f4f8',
     borderRadius: 8,
     padding: 10,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#c5cae9',
   },
-  timeBtnText: { fontSize: 15, fontWeight: '700', color: '#1a237e' },
-  timeDash: { fontSize: 18, color: '#9fa8da', paddingBottom: 8 },
+  timeBtnText: { fontSize: 15, fontWeight: '700' },
+  timeDash: { fontSize: 18, paddingBottom: 8 },
   durationBox: { alignItems: 'center', paddingBottom: 4, minWidth: 52 },
-  durationLabel: { fontSize: 10, color: '#aaa', textTransform: 'uppercase', letterSpacing: 0.4 },
-  durationValue: { fontSize: 14, fontWeight: '700', color: '#555' },
+  durationLabel: { fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.4 },
+  durationValue: { fontSize: 14, fontWeight: '700' },
 
   addBlockBtn: {
     borderWidth: 2,
-    borderColor: '#c5cae9',
     borderStyle: 'dashed',
     borderRadius: 12,
     padding: 14,
@@ -465,15 +449,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 20,
   },
-  addBlockBtnText: { color: '#1a237e', fontSize: 15, fontWeight: '600' },
+  addBlockBtnText: { fontSize: 15, fontWeight: '600' },
 
   saveBtn: {
-    backgroundColor: '#1a237e',
     borderRadius: 14,
     padding: 16,
     alignItems: 'center',
   },
-  saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  saveBtnText: { fontSize: 16, fontWeight: '700' },
 });
 
 // ── Time Picker Modal Styles ───────────────────────────────────────────────────
@@ -487,7 +470,6 @@ const tp = StyleSheet.create({
     padding: 24,
   },
   sheet: {
-    backgroundColor: '#fff',
     borderRadius: 20,
     padding: 24,
     width: '100%',
@@ -498,28 +480,24 @@ const tp = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
   },
-  title: { fontSize: 16, fontWeight: '700', color: '#1a237e', textAlign: 'center', marginBottom: 20 },
+  title: { fontSize: 16, fontWeight: '700', textAlign: 'center', marginBottom: 20 },
   pickerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 24 },
   spinnerCol: { alignItems: 'center', width: 64 },
   arrowBtn: { padding: 8 },
-  arrow: { fontSize: 18, color: '#1a237e' },
-  timeValue: { fontSize: 36, fontWeight: '700', color: '#222', width: 64, textAlign: 'center', fontVariant: ['tabular-nums'] },
-  colon: { fontSize: 32, color: '#555', fontWeight: '700', paddingBottom: 4 },
+  arrow: { fontSize: 18 },
+  timeValue: { fontSize: 36, fontWeight: '700', width: 64, textAlign: 'center', fontVariant: ['tabular-nums'] },
+  colon: { fontSize: 32, fontWeight: '700', paddingBottom: 4 },
   periodCol: { gap: 8, marginLeft: 8 },
   periodBtn: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: '#f0f4f8',
     borderWidth: 1,
-    borderColor: '#dde3f0',
   },
-  periodBtnActive: { backgroundColor: '#1a237e', borderColor: '#1a237e' },
-  periodText: { fontSize: 14, fontWeight: '700', color: '#888' },
-  periodTextActive: { color: '#fff' },
+  periodText: { fontSize: 14, fontWeight: '700' },
   btnRow: { flexDirection: 'row', gap: 12 },
-  cancelBtn: { flex: 1, padding: 14, borderRadius: 12, backgroundColor: '#f0f4f8', alignItems: 'center' },
-  cancelText: { fontSize: 15, fontWeight: '600', color: '#555' },
-  confirmBtn: { flex: 1, padding: 14, borderRadius: 12, backgroundColor: '#1a237e', alignItems: 'center' },
-  confirmText: { fontSize: 15, fontWeight: '700', color: '#fff' },
+  cancelBtn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
+  cancelText: { fontSize: 15, fontWeight: '600' },
+  confirmBtn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
+  confirmText: { fontSize: 15, fontWeight: '700' },
 });

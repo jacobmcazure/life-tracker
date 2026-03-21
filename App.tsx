@@ -6,17 +6,14 @@ import { StatusBar } from 'expo-status-bar';
 import { Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { TasksProvider } from './src/context/TasksContext';
+import { MoodProvider } from './src/context/MoodContext';
 import { SchedulerProvider } from './src/context/SchedulerContext';
-import { SettingsProvider } from './src/context/SettingsContext';
-import TodayScreen from './src/screens/TodayScreen';
-import AllTasksScreen from './src/screens/AllTasksScreen';
+import { SettingsProvider, useTheme } from './src/context/SettingsContext';
+import DashboardScreen from './src/screens/DashboardScreen';
+import JournalScreen from './src/screens/JournalScreen';
 import CalendarScreen from './src/screens/CalendarScreen';
-import MoodScreen from './src/screens/MoodScreen';
 import SchedulerScreen from './src/screens/SchedulerScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
-import AddTaskScreen from './src/screens/AddTaskScreen';
-import EditTaskScreen from './src/screens/EditTaskScreen';
 import TemplateEditorScreen from './src/screens/TemplateEditorScreen';
 
 const Tab = createBottomTabNavigator();
@@ -24,10 +21,9 @@ const Stack = createStackNavigator();
 
 function TabIcon({ label }: { label: string; focused: boolean }) {
   const icons: Record<string, string> = {
-    Today: '☀️',
-    Tasks: '✅',
+    Dashboard: '🏠',
+    Journal: '📓',
     Calendar: '📅',
-    Mood: '😊',
     Scheduler: '🗓️',
     Settings: '⚙️',
   };
@@ -35,25 +31,44 @@ function TabIcon({ label }: { label: string; focused: boolean }) {
 }
 
 function MainTabs() {
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerStyle: { backgroundColor: '#1a237e' },
-        headerTintColor: '#fff',
+        headerStyle: { backgroundColor: colors.headerBg },
+        headerTintColor: colors.headerText,
         headerTitleStyle: { fontWeight: '700' },
-        tabBarStyle: { backgroundColor: '#fff', borderTopColor: '#e8eaf6' },
-        tabBarActiveTintColor: '#1a237e',
-        tabBarInactiveTintColor: '#9e9e9e',
+        tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.border },
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.muted,
         tabBarIcon: ({ focused }) => <TabIcon label={route.name} focused={focused} />,
       })}
     >
-      <Tab.Screen name="Today" component={TodayScreen} />
-      <Tab.Screen name="Tasks" component={AllTasksScreen} />
+      <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen name="Journal" component={JournalScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
-      <Tab.Screen name="Mood" component={MoodScreen} />
       <Tab.Screen name="Scheduler" component={SchedulerScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
+  );
+}
+
+function AppNavigator() {
+  const { colors } = useTheme();
+  return (
+    <NavigationContainer>
+      <StatusBar style="light" />
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: { backgroundColor: colors.headerBg },
+          headerTintColor: colors.headerText,
+          headerTitleStyle: { fontWeight: '700' },
+        }}
+      >
+        <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+        <Stack.Screen name="TemplateEditor" component={TemplateEditorScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -61,25 +76,11 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SettingsProvider>
-        <TasksProvider>
+        <MoodProvider>
           <SchedulerProvider>
-            <NavigationContainer>
-              <StatusBar style="light" />
-              <Stack.Navigator
-                screenOptions={{
-                  headerStyle: { backgroundColor: '#1a237e' },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: { fontWeight: '700' },
-                }}
-              >
-                <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
-                <Stack.Screen name="AddTask" component={AddTaskScreen} options={{ title: 'New Task' }} />
-                <Stack.Screen name="EditTask" component={EditTaskScreen} options={{ title: 'Edit Task' }} />
-                <Stack.Screen name="TemplateEditor" component={TemplateEditorScreen} />
-              </Stack.Navigator>
-            </NavigationContainer>
+            <AppNavigator />
           </SchedulerProvider>
-        </TasksProvider>
+        </MoodProvider>
       </SettingsProvider>
     </GestureHandlerRootView>
   );

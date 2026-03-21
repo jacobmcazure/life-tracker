@@ -1,27 +1,31 @@
 import { format } from 'date-fns';
-import { Task } from '../types';
+import { ScheduleTemplate } from '../types';
 
 export function todayKey(): string {
   return format(new Date(), 'yyyy-MM-dd');
 }
 
-export function calcCompletionDate(task: Task): string | null {
-  if (!task.totalAmount || !task.dailyGoalAmount || task.dailyGoalAmount <= 0) return null;
-
-  const completedDays = Object.values(task.completions).filter(Boolean).length;
-  const completedAmount = completedDays * task.dailyGoalAmount;
-  const remaining = task.totalAmount - completedAmount;
-  if (remaining <= 0) return 'Done';
-
-  const daysLeft = Math.ceil(remaining / task.dailyGoalAmount);
-  const target = new Date();
-  target.setDate(target.getDate() + daysLeft);
-  return format(target, 'MMM d, yyyy');
+export function formatTime(hhmm: string): string {
+  const [hStr, mStr] = hhmm.split(':');
+  const h = parseInt(hStr, 10);
+  const period = h >= 12 ? 'pm' : 'am';
+  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  return `${h12}:${mStr}${period}`;
 }
 
-export function getDayCompletionRate(tasks: Task[], dateKey: string): number {
-  const activeTasks = tasks.filter((t) => t.frequency !== 'longterm');
-  if (activeTasks.length === 0) return 0;
-  const completed = activeTasks.filter((t) => t.completions[dateKey]).length;
-  return Math.round((completed / activeTasks.length) * 100);
+/**
+ * Calculate the completion rate for a day based on schedule block completions.
+ * @param template  The resolved template for that day (may be null if none assigned).
+ * @param dayCompletions  A map of blockId -> boolean for that specific day.
+ * @returns An integer percentage 0-100.
+ */
+export function getDayCompletionRate(
+  template: ScheduleTemplate | null,
+  dayCompletions: Record<string, boolean> | undefined,
+): number {
+  if (!template || template.blocks.length === 0) return 0;
+  if (!dayCompletions) return 0;
+  const total = template.blocks.length;
+  const completed = template.blocks.filter((b) => dayCompletions[b.id]).length;
+  return Math.round((completed / total) * 100);
 }

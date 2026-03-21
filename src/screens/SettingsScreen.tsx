@@ -9,10 +9,14 @@ import {
   Alert,
 } from 'react-native';
 import { format, differenceInDays, parseISO, subDays } from 'date-fns';
-import { useSettings } from '../context/SettingsContext';
-import { useTasks } from '../context/TasksContext';
-import { todayKey } from '../utils/dates';
+import { useSettings, useTheme } from '../context/SettingsContext';
+import { useScheduler } from '../context/SchedulerContext';
+import { useMood } from '../context/MoodContext';
+import { resolveTemplate } from '../storage/scheduler';
+import { todayKey, getDayCompletionRate } from '../utils/dates';
+import { BUILT_IN_THEMES } from '../themes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ScheduleTemplate, DayAssignment, BlockCompletions } from '../types';
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -20,25 +24,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /** Compute the current daily-completion streak ending today (or yesterday). */
 function computeStreak(
-  completions: Array<Record<string, boolean>>,
-  activeTasks: number,
+  templates: ScheduleTemplate[],
+  assignments: DayAssignment,
+  blockCompletions: BlockCompletions,
 ): number {
-  if (activeTasks === 0) return 0;
-
   let streak = 0;
   const today = new Date();
-
   for (let offset = 0; offset < 365; offset++) {
     const d = subDays(today, offset);
     const key = format(d, 'yyyy-MM-dd');
-
-    const doneCount = completions.filter((c) => c[key]).length;
-    // Count the day if the user completed all active tasks that day
-    if (doneCount >= activeTasks) {
+    const template = resolveTemplate(assignments, templates, key);
+    if (!template || template.blocks.length === 0) {
+      if (offset === 0) continue; // today with no schedule doesn't break streak
+      break; // past day with no schedule breaks the streak
+    }
+    const dayData = blockCompletions[key] ?? {};
+    const allDone = template.blocks.every((b) => dayData[b.id]);
+    if (allDone) {
       streak++;
     } else if (offset === 0) {
-      // Today isn't complete yet -- that's okay, keep checking yesterday
-      continue;
+      continue; // today isn't done yet, keep checking
     } else {
       break;
     }
@@ -52,42 +57,39 @@ function computeStreak(
 
 export default function SettingsScreen() {
   const { settings, updateSettings } = useSettings();
-  const { tasks, moodEntries } = useTasks();
+  const theme = useTheme();
+  const { colors } = theme;
+  const { templates, assignments, blockCompletions } = useScheduler();
+  const { moodEntries } = useMood();
 
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(settings.displayName);
 
-  const isDark = settings.theme === 'dark';
-
   // --- derived stats ---
-  const activeTasks = useMemo(
-    () => tasks.filter((t) => t.frequency !== 'longterm'),
-    [tasks],
-  );
-  const longtermTasks = useMemo(
-    () => tasks.filter((t) => t.frequency === 'longterm'),
-    [tasks],
-  );
-  const completedLongterm = useMemo(
-    () => longtermTasks.filter((t) => t.longtermStatus === 'completed').length,
-    [longtermTasks],
-  );
-
   const streak = useMemo(
-    () => computeStreak(activeTasks.map((t) => t.completions), activeTasks.length),
-    [activeTasks],
+    () => computeStreak(templates, assignments, blockCompletions),
+    [templates, assignments, blockCompletions],
   );
 
   const today = todayKey();
-  const todayDone = activeTasks.filter((t) => t.completions[today]).length;
+  const todayTemplate = useMemo(
+    () => resolveTemplate(assignments, templates, today),
+    [assignments, templates, today],
+  );
+  const todayBlocks = todayTemplate ? todayTemplate.blocks.length : 0;
+  const todayDone = useMemo(() => {
+    if (!todayTemplate) return 0;
+    const dayData = blockCompletions[today] ?? {};
+    return todayTemplate.blocks.filter((b) => dayData[b.id]).length;
+  }, [todayTemplate, blockCompletions, today]);
 
   const totalCompletions = useMemo(
     () =>
-      tasks.reduce(
-        (sum, t) => sum + Object.values(t.completions).filter(Boolean).length,
+      Object.values(blockCompletions).reduce(
+        (sum, dayData) => sum + Object.values(dayData).filter(Boolean).length,
         0,
       ),
-    [tasks],
+    [blockCompletions],
   );
 
   const memberDays = settings.dateJoined
@@ -105,13 +107,15 @@ export default function SettingsScreen() {
   };
 
   const toggleTheme = () => {
-    updateSettings({ theme: isDark ? 'light' : 'dark' });
+    const currentIdx = BUILT_IN_THEMES.findIndex((t) => t.id === settings.activeThemeId);
+    const nextIdx = (currentIdx + 1) % BUILT_IN_THEMES.length;
+    updateSettings({ activeThemeId: BUILT_IN_THEMES[nextIdx].id });
   };
 
   const confirmClearData = () => {
     Alert.alert(
       'Clear All Data',
-      'This will permanently delete all tasks, mood entries, schedules, and settings. This cannot be undone.',
+      'This will permanently delete all completions, mood entries, schedules, notes, and settings. This cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -125,33 +129,6 @@ export default function SettingsScreen() {
       ],
     );
   };
-
-  // --- theming ---
-  const colors = isDark
-    ? {
-        bg: '#121212',
-        card: '#1e1e1e',
-        text: '#e0e0e0',
-        muted: '#888',
-        primary: '#7986cb',
-        headerBg: '#1a237e',
-        border: '#333',
-        inputBg: '#2a2a2a',
-        dangerBg: '#3e1a1a',
-        dangerText: '#ef5350',
-      }
-    : {
-        bg: '#f0f4f8',
-        card: '#fff',
-        text: '#1a237e',
-        muted: '#888',
-        primary: '#1a237e',
-        headerBg: '#1a237e',
-        border: '#e8eaf6',
-        inputBg: '#f5f5f5',
-        dangerBg: '#fdecea',
-        dangerText: '#c62828',
-      };
 
   /* ---------------------------------------------------------------- */
   /*  Render helpers                                                   */
@@ -206,8 +183,8 @@ export default function SettingsScreen() {
               onSubmitEditing={saveName}
               returnKeyType="done"
             />
-            <TouchableOpacity style={styles.saveBtn} onPress={saveName}>
-              <Text style={styles.saveBtnText}>Save</Text>
+            <TouchableOpacity style={[styles.saveBtn, { backgroundColor: colors.primary }]} onPress={saveName}>
+              <Text style={[styles.saveBtnText, { color: colors.headerText }]}>Save</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -232,10 +209,10 @@ export default function SettingsScreen() {
             <Text style={[styles.rowLabel, { color: colors.text }]}>Theme</Text>
             <View style={styles.themeToggle}>
               <Text style={[styles.rowValue, { color: colors.muted, marginRight: 8 }]}>
-                {isDark ? 'Dark' : 'Light'}
+                {theme.name}
               </Text>
-              <View style={[styles.toggleTrack, isDark && styles.toggleTrackActive]}>
-                <View style={[styles.toggleThumb, isDark && styles.toggleThumbActive]} />
+              <View style={[styles.toggleTrack, { backgroundColor: colors.border }, settings.activeThemeId !== 'light' && { backgroundColor: colors.primary }]}>
+                <View style={[styles.toggleThumb, settings.activeThemeId !== 'light' && styles.toggleThumbActive]} />
               </View>
             </View>
           </View>
@@ -248,14 +225,10 @@ export default function SettingsScreen() {
         <Row label="Current Streak" value={`${streak} day${streak !== 1 ? 's' : ''}`} />
         <Row
           label="Today's Progress"
-          value={`${todayDone}/${activeTasks.length} tasks`}
+          value={`${todayDone}/${todayBlocks} blocks`}
         />
         <Row label="Total Completions" value={`${totalCompletions}`} />
-        <Row label="Active Tasks" value={`${activeTasks.length}`} />
-        <Row
-          label="Long-term Goals"
-          value={`${completedLongterm}/${longtermTasks.length} completed`}
-        />
+        <Row label="Schedule Templates" value={`${templates.length}`} />
         <Row label="Mood Entries" value={`${moodEntries.length}`} />
       </View>
 
@@ -344,12 +317,11 @@ const styles = StyleSheet.create({
   },
   saveBtn: {
     marginLeft: 10,
-    backgroundColor: '#1a237e',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  saveBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  saveBtnText: { fontWeight: '600', fontSize: 14 },
 
   // theme toggle
   themeToggle: { flexDirection: 'row', alignItems: 'center' },
@@ -357,11 +329,9 @@ const styles = StyleSheet.create({
     width: 44,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#c5cae9',
     justifyContent: 'center',
     paddingHorizontal: 2,
   },
-  toggleTrackActive: { backgroundColor: '#7986cb' },
   toggleThumb: {
     width: 20,
     height: 20,
