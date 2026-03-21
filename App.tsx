@@ -8,11 +8,13 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { TasksProvider } from './src/context/TasksContext';
 import { SchedulerProvider } from './src/context/SchedulerContext';
+import { SettingsProvider } from './src/context/SettingsContext';
 import TodayScreen from './src/screens/TodayScreen';
 import AllTasksScreen from './src/screens/AllTasksScreen';
 import CalendarScreen from './src/screens/CalendarScreen';
 import MoodScreen from './src/screens/MoodScreen';
 import SchedulerScreen from './src/screens/SchedulerScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 import AddTaskScreen from './src/screens/AddTaskScreen';
 import EditTaskScreen from './src/screens/EditTaskScreen';
 import TemplateEditorScreen from './src/screens/TemplateEditorScreen';
@@ -27,6 +29,7 @@ function TabIcon({ label }: { label: string; focused: boolean }) {
     Calendar: '📅',
     Mood: '😊',
     Scheduler: '🗓️',
+    Settings: '⚙️',
   };
   return <Text style={{ fontSize: 20 }}>{icons[label] ?? '•'}</Text>;
 }
@@ -49,6 +52,7 @@ function MainTabs() {
       <Tab.Screen name="Calendar" component={CalendarScreen} />
       <Tab.Screen name="Mood" component={MoodScreen} />
       <Tab.Screen name="Scheduler" component={SchedulerScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
 }
@@ -56,25 +60,27 @@ function MainTabs() {
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <TasksProvider>
-        <SchedulerProvider>
-          <NavigationContainer>
-            <StatusBar style="light" />
-            <Stack.Navigator
-              screenOptions={{
-                headerStyle: { backgroundColor: '#1a237e' },
-                headerTintColor: '#fff',
-                headerTitleStyle: { fontWeight: '700' },
-              }}
-            >
-              <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
-              <Stack.Screen name="AddTask" component={AddTaskScreen} options={{ title: 'New Task' }} />
-              <Stack.Screen name="EditTask" component={EditTaskScreen} options={{ title: 'Edit Task' }} />
-              <Stack.Screen name="TemplateEditor" component={TemplateEditorScreen} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </SchedulerProvider>
-      </TasksProvider>
+      <SettingsProvider>
+        <TasksProvider>
+          <SchedulerProvider>
+            <NavigationContainer>
+              <StatusBar style="light" />
+              <Stack.Navigator
+                screenOptions={{
+                  headerStyle: { backgroundColor: '#1a237e' },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: { fontWeight: '700' },
+                }}
+              >
+                <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+                <Stack.Screen name="AddTask" component={AddTaskScreen} options={{ title: 'New Task' }} />
+                <Stack.Screen name="EditTask" component={EditTaskScreen} options={{ title: 'Edit Task' }} />
+                <Stack.Screen name="TemplateEditor" component={TemplateEditorScreen} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </SchedulerProvider>
+        </TasksProvider>
+      </SettingsProvider>
     </GestureHandlerRootView>
   );
 }

@@ -56,3 +56,12 @@ export interface DayAssignment {
   // specific date overrides: key is 'YYYY-MM-DD'
   dates: Record<string, string>;    // dateKey -> templateId
 }
+
+// Settings
+export type ThemeMode = 'light' | 'dark';
+
+export interface UserSettings {
+  displayName: string;
+  dateJoined: string;    // ISO date string, set once on first launch
+  theme: ThemeMode;
+}
