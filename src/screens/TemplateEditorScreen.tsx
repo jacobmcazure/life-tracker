@@ -9,6 +9,7 @@ import {
   ScrollView,
   Alert,
   Modal,
+  Switch,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useScheduler } from '../context/SchedulerContext';
@@ -192,6 +193,7 @@ export default function TemplateEditorScreen() {
       startTime: defaultStart,
       endTime: defaultEnd,
       activity: '',
+      tracked: false,
     };
     setBlocks((prev) => [...prev, newBlock]);
   };
@@ -348,6 +350,17 @@ export default function TemplateEditorScreen() {
                 </Text>
               </View>
             </View>
+
+            {/* Track on dashboard toggle */}
+            <View style={[styles.trackRow, { borderTopColor: colors.border }]}>
+              <Text style={[styles.trackLabel, { color: colors.text }]}>Track on dashboard</Text>
+              <Switch
+                value={!!block.tracked}
+                onValueChange={(val) => updateBlock(block.id, { tracked: val })}
+                trackColor={{ false: colors.border, true: colors.accent }}
+                thumbColor={block.tracked ? colors.primary : colors.muted}
+              />
+            </View>
           </View>
         ))}
 
@@ -457,6 +470,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveBtnText: { fontSize: 16, fontWeight: '700' },
+
+  trackRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  trackLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
 });
 
 // ── Time Picker Modal Styles ───────────────────────────────────────────────────

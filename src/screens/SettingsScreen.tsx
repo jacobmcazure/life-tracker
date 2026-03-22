@@ -38,8 +38,13 @@ function computeStreak(
       if (offset === 0) continue; // today with no schedule doesn't break streak
       break; // past day with no schedule breaks the streak
     }
+    const trackedBlocks = template.blocks.filter((b) => b.tracked);
+    if (trackedBlocks.length === 0) {
+      if (offset === 0) continue;
+      break;
+    }
     const dayData = blockCompletions[key] ?? {};
-    const allDone = template.blocks.every((b) => dayData[b.id]);
+    const allDone = trackedBlocks.every((b) => dayData[b.id]);
     if (allDone) {
       streak++;
     } else if (offset === 0) {
@@ -76,11 +81,14 @@ export default function SettingsScreen() {
     () => resolveTemplate(assignments, templates, today),
     [assignments, templates, today],
   );
-  const todayBlocks = todayTemplate ? todayTemplate.blocks.length : 0;
+  const todayTrackedBlocks = todayTemplate
+    ? todayTemplate.blocks.filter((b) => b.tracked)
+    : [];
+  const todayBlocks = todayTrackedBlocks.length;
   const todayDone = useMemo(() => {
     if (!todayTemplate) return 0;
     const dayData = blockCompletions[today] ?? {};
-    return todayTemplate.blocks.filter((b) => dayData[b.id]).length;
+    return todayTrackedBlocks.filter((b) => dayData[b.id]).length;
   }, [todayTemplate, blockCompletions, today]);
 
   const totalCompletions = useMemo(

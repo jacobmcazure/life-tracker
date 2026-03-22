@@ -64,7 +64,7 @@ export default function JournalScreen() {
 
   const completedBlocks = todayTemplate
     ? todayTemplate.blocks
-        .filter((b) => dayCompletions[b.id])
+        .filter((b) => b.tracked && dayCompletions[b.id])
         .sort((a, b) => a.startTime.localeCompare(b.startTime))
     : [];
 

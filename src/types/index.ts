@@ -39,6 +39,7 @@ export interface TimeBlock {
   endTime: string;   // 'HH:mm' 24h
   activity: string;
   color?: string;    // optional accent color hex
+  tracked?: boolean; // if true, shown on Dashboard and counted for completion stats
 }
 
 export interface ScheduleTemplate {

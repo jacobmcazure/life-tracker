@@ -44,9 +44,9 @@ export default function DashboardScreen() {
 
   const sortedBlocks = useMemo(() => {
     if (!template) return [];
-    return [...template.blocks].sort((a, b) =>
-      a.startTime.localeCompare(b.startTime),
-    );
+    return [...template.blocks]
+      .filter((b) => b.tracked)
+      .sort((a, b) => a.startTime.localeCompare(b.startTime));
   }, [template]);
 
   const dayCompletions = blockCompletions[dateKey] ?? {};
@@ -111,10 +111,12 @@ export default function DashboardScreen() {
   const renderEmpty = () => (
     <View style={[styles.emptyCard, { backgroundColor: c.card }]}>
       <Text style={[styles.emptyTitle, { color: c.muted }]}>
-        No schedule assigned for today.
+        {template ? 'No tracked tasks for today.' : 'No schedule assigned for today.'}
       </Text>
       <Text style={[styles.emptyHint, { color: c.muted }]}>
-        Set one up in the Scheduler tab.
+        {template
+          ? 'Mark tasks as tracked in the Scheduler to see them here.'
+          : 'Set one up in the Scheduler tab.'}
       </Text>
     </View>
   );
