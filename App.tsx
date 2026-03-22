@@ -7,7 +7,6 @@ import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   useFonts,
-  Newsreader_400Regular,
   Newsreader_400Regular_Italic,
   Newsreader_600SemiBold_Italic,
   Newsreader_700Bold_Italic,
@@ -69,7 +68,6 @@ function AppNavigator() {
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    Newsreader_400Regular,
     Newsreader_400Regular_Italic,
     Newsreader_600SemiBold_Italic,
     Newsreader_700Bold_Italic,

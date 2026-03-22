@@ -9,12 +9,13 @@ import {
   Alert,
 } from 'react-native';
 import ScreenHeader from '../components/ScreenHeader';
+import { layout, TAB_BAR_BOTTOM_INSET } from '../styles/shared';
 import { format, differenceInDays, parseISO, subDays } from 'date-fns';
 import { useSettings, useTheme } from '../context/SettingsContext';
 import { useScheduler } from '../context/SchedulerContext';
 import { useMood } from '../context/MoodContext';
 import { resolveTemplate } from '../storage/scheduler';
-import { todayKey, getDayCompletionRate } from '../utils/dates';
+import { todayKey } from '../utils/dates';
 import { BUILT_IN_THEMES } from '../themes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScheduleTemplate, DayAssignment, BlockCompletions } from '../types';
@@ -670,8 +671,6 @@ export default function SettingsScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Bottom spacing for tab bar */}
-      <View style={{ height: 120 }} />
       </ScrollView>
     </View>
   );
@@ -685,12 +684,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  rootContainer: {
-    flex: 1,
-  },
+  rootContainer: layout.root,
   contentContainer: {
     paddingHorizontal: 24,
     paddingTop: 8,
+    paddingBottom: TAB_BAR_BOTTOM_INSET,
   },
 
   /* ── Hero / Appearance ─────────────────────────────────────────── */
@@ -843,7 +841,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#ffffff', // Always white for contrast against track color
   },
 
   /* ── Stats Grid ────────────────────────────────────────────────── */

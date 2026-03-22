@@ -13,6 +13,7 @@ import { todayKey, formatTime } from '../utils/dates';
 import { TimeBlock } from '../types';
 import ScreenHeader from '../components/ScreenHeader';
 import ProgressRing from '../components/ProgressRing';
+import { typography, layout, TAB_BAR_BOTTOM_INSET } from '../styles/shared';
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -94,7 +95,7 @@ export default function DashboardScreen() {
                 { backgroundColor: colors.primaryContainer },
               ]}
             >
-              <Text style={styles.checkMarkText}>{'\u2713'}</Text>
+              <Text style={[styles.checkMarkText, { color: colors.onPrimary }]}>{'\u2713'}</Text>
             </View>
             <View style={styles.blockTextColumn}>
               <Text
@@ -219,6 +220,7 @@ export default function DashboardScreen() {
                 trackColor={colors.surfaceContainerHighest}
                 progressColor={colors.primaryContainer}
                 progress={progressPct}
+                innerColor={colors.surfaceContainerLow}
               >
                 <Text
                   style={[styles.scoreValue, { color: colors.primary }]}
@@ -359,27 +361,16 @@ export default function DashboardScreen() {
 /* ------------------------------------------------------------------ */
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: layout.root,
 
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingBottom: 140,
-  },
+  scrollContent: layout.scrollContent,
 
   /* ── Hero ──────────────────────────────────────────────────────── */
 
   heroSection: {
     marginBottom: 40,
   },
-  eyebrow: {
-    fontFamily: 'Manrope_700Bold',
-    fontSize: 11,
-    letterSpacing: 3,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-  },
+  eyebrow: typography.eyebrow,
   greeting: {
     fontFamily: 'Newsreader_400Regular_Italic',
     fontSize: 40,
@@ -497,7 +488,6 @@ const styles = StyleSheet.create({
   },
   checkMarkText: {
     fontSize: 12,
-    color: '#FFFFFF',
     fontWeight: '700',
   },
   checkCircleEmpty: {

@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
-  Switch,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useScheduler } from '../context/SchedulerContext';
@@ -15,6 +14,7 @@ import { deleteTemplate, assignWeekday, loadAssignments } from '../storage/sched
 import { formatTime } from '../utils/dates';
 import { ScheduleTemplate } from '../types';
 import ScreenHeader from '../components/ScreenHeader';
+import { typography, layout, TAB_BAR_BOTTOM_INSET } from '../styles/shared';
 
 // ── Constants ───────────────────────────────────────────────────────────────
 
@@ -342,7 +342,6 @@ export default function SchedulerScreen() {
           </View>
         )}
 
-        <View style={{ height: 120 }} />
       </ScrollView>
 
       {/* FAB */}
@@ -360,13 +359,8 @@ export default function SchedulerScreen() {
 // ── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-  },
+  root: layout.root,
+  scroll: layout.scrollContent,
 
   // ── Header ──
   headerSection: {
@@ -378,10 +372,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   eyebrow: {
-    fontFamily: 'Manrope_700Bold',
-    fontSize: 11,
-    letterSpacing: 3,
-    textTransform: 'uppercase',
+    ...typography.eyebrow,
     marginBottom: 4,
   },
   headerTitle: {
@@ -395,10 +386,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionLabel: {
-    fontFamily: 'Manrope_700Bold',
-    fontSize: 10,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
+    ...typography.sectionLabel,
     marginBottom: 6,
   },
   sectionHint: {

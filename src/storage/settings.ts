@@ -7,7 +7,7 @@ const SETTINGS_KEY = '@life_tracker_settings';
 const DEFAULT_SETTINGS: UserSettings = {
   displayName: '',
   dateJoined: format(new Date(), 'yyyy-MM-dd'),
-  activeThemeId: 'light',
+  activeThemeId: 'vibrant-sanctuary',
 };
 
 export async function loadSettings(): Promise<UserSettings> {

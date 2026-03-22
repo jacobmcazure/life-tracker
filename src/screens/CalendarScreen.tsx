@@ -21,6 +21,7 @@ import { getDayCompletionRate, formatTime } from '../utils/dates';
 import { resolveTemplate } from '../storage/scheduler';
 import ScreenHeader from '../components/ScreenHeader';
 import ProgressRing from '../components/ProgressRing';
+import { typography, layout, TAB_BAR_BOTTOM_INSET } from '../styles/shared';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -222,7 +223,7 @@ export default function CalendarScreen() {
                       styles.dayNum,
                       {
                         color: opacity > 0.45
-                          ? '#ffffff'
+                          ? colors.onPrimary
                           : future
                             ? colors.onSurfaceVariant + '40'
                             : colors.primary,
@@ -258,6 +259,7 @@ export default function CalendarScreen() {
                 trackColor={colors.surfaceContainer}
                 progressColor={colors.primary}
                 progress={selectedDayData.rate}
+                innerColor={colors.surfaceContainerLowest}
               >
                 <Text style={[styles.scoreValue, { color: colors.onSurface }]}>
                   {selectedDayData.rate}%
@@ -370,7 +372,6 @@ export default function CalendarScreen() {
           </View>
         </View>
 
-        <View style={{ height: 120 }} />
       </ScrollView>
     </View>
   );
@@ -379,13 +380,8 @@ export default function CalendarScreen() {
 // ── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-  },
+  root: layout.root,
+  scroll: layout.scrollContent,
 
   // ── Header ──
   headerSection: {
@@ -396,13 +392,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-end',
   },
-  eyebrow: {
-    fontFamily: 'Manrope_700Bold',
-    fontSize: 11,
-    letterSpacing: 3,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-  },
+  eyebrow: typography.eyebrow,
   monthNavRow: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -15,16 +15,9 @@ import { resolveTemplate } from '../storage/scheduler';
 import { todayKey, formatTime } from '../utils/dates';
 import { MoodLevel } from '../types';
 import ScreenHeader from '../components/ScreenHeader';
+import { typography, layout, TAB_BAR_BOTTOM_INSET } from '../styles/shared';
 
 // ── Constants ────────────────────────────────────────────────────────────────
-
-const MOOD_LABELS: Record<MoodLevel, string> = {
-  1: 'Terrible',
-  2: 'Bad',
-  3: 'Okay',
-  4: 'Good',
-  5: 'Great',
-};
 
 const MOOD_EMOJI: Record<MoodLevel, string> = {
   1: '😢',
@@ -437,29 +430,15 @@ export default function JournalScreen() {
 // ── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingBottom: 140,
-  },
+  root: layout.root,
+  scroll: layout.scrollContent,
 
   // ── Hero ──
   hero: {
     marginBottom: 32,
   },
-  eyebrow: {
-    fontFamily: 'Manrope_700Bold',
-    fontSize: 11,
-    letterSpacing: 3,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-  },
-  heroTitle: {
-    fontFamily: 'Newsreader_400Regular_Italic',
-    fontSize: 38,
-  },
+  eyebrow: typography.eyebrow,
+  heroTitle: typography.heroTitle,
 
   // ── Mood Selector Card ──
   moodCard: {
@@ -514,13 +493,7 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 40,
   },
-  sectionLabel: {
-    fontFamily: 'Manrope_700Bold',
-    fontSize: 11,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    marginBottom: 16,
-  },
+  sectionLabel: typography.sectionLabel,
 
   // ── Today's Moments Grid ──
   grid: {
