@@ -1,6 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
-import { BlurView } from "expo-blur";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useTheme, useSettings } from "../context/SettingsContext";
 
 interface ScreenHeaderProps {
@@ -12,8 +11,8 @@ export default function ScreenHeader({ showPageName }: ScreenHeaderProps) {
   const { settings } = useSettings();
   const initial = settings.displayName?.charAt(0)?.toUpperCase() || "?";
 
-  const content = (
-    <>
+  return (
+    <View style={[styles.container, { backgroundColor: colors.surface + "F2" }]}>
       {/* Left side: hamburger + app title */}
       <View style={styles.left}>
         <TouchableOpacity activeOpacity={0.6}>
@@ -42,21 +41,6 @@ export default function ScreenHeader({ showPageName }: ScreenHeaderProps) {
           </Text>
         </View>
       </View>
-    </>
-  );
-
-  // BlurView works best on iOS; fall back to semi-transparent on Android
-  if (Platform.OS === "ios") {
-    return (
-      <BlurView intensity={60} tint="systemChromeMaterialLight" style={styles.container}>
-        {content}
-      </BlurView>
-    );
-  }
-
-  return (
-    <View style={[styles.container, { backgroundColor: colors.surface + "F2" }]}>
-      {content}
     </View>
   );
 }

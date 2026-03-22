@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Platform, Text } from 'react-native';
-import { BlurView } from 'expo-blur';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useTheme } from '../context/SettingsContext';
 
@@ -10,79 +9,6 @@ export default function BottomTabBar({
   navigation,
 }: BottomTabBarProps) {
   const { colors } = useTheme();
-
-  const tabs = state.routes.map((route, index) => {
-    const { options } = descriptors[route.key];
-    const label =
-      typeof options.tabBarLabel === 'string'
-        ? options.tabBarLabel
-        : route.name;
-    const isFocused = state.index === index;
-
-    const onPress = () => {
-      const event = navigation.emit({
-        type: 'tabPress',
-        target: route.key,
-        canPreventDefault: true,
-      });
-
-      if (!isFocused && !event.defaultPrevented) {
-        navigation.navigate(route.name);
-      }
-    };
-
-    const onLongPress = () => {
-      navigation.emit({
-        type: 'tabLongPress',
-        target: route.key,
-      });
-    };
-
-    return (
-      <TouchableOpacity
-        key={route.key}
-        accessibilityRole="button"
-        accessibilityState={isFocused ? { selected: true } : {}}
-        accessibilityLabel={options.tabBarAccessibilityLabel}
-        onPress={onPress}
-        onLongPress={onLongPress}
-        style={[
-          styles.tab,
-          isFocused && {
-            backgroundColor: colors.primaryContainer,
-          },
-        ]}
-        activeOpacity={0.7}
-      >
-        <Text
-          style={[
-            styles.label,
-            {
-              color: isFocused
-                ? colors.onPrimary
-                : colors.onSurface + '99',
-            },
-          ]}
-          numberOfLines={1}
-        >
-          {label.toUpperCase()}
-        </Text>
-      </TouchableOpacity>
-    );
-  });
-
-  // BlurView works best on iOS; fall back to semi-transparent on Android
-  if (Platform.OS === 'ios') {
-    return (
-      <BlurView
-        intensity={60}
-        tint="systemChromeMaterialLight"
-        style={[styles.container, { shadowColor: colors.onSurface }]}
-      >
-        {tabs}
-      </BlurView>
-    );
-  }
 
   return (
     <View
@@ -94,7 +20,65 @@ export default function BottomTabBar({
         },
       ]}
     >
-      {tabs}
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const label =
+          typeof options.tabBarLabel === 'string'
+            ? options.tabBarLabel
+            : route.name;
+        const isFocused = state.index === index;
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
+        const onLongPress = () => {
+          navigation.emit({
+            type: 'tabLongPress',
+            target: route.key,
+          });
+        };
+
+        return (
+          <TouchableOpacity
+            key={route.key}
+            accessibilityRole="button"
+            accessibilityState={isFocused ? { selected: true } : {}}
+            accessibilityLabel={options.tabBarAccessibilityLabel}
+            onPress={onPress}
+            onLongPress={onLongPress}
+            style={[
+              styles.tab,
+              isFocused && {
+                backgroundColor: colors.primaryContainer,
+              },
+            ]}
+            activeOpacity={0.7}
+          >
+            <Text
+              style={[
+                styles.label,
+                {
+                  color: isFocused
+                    ? colors.onPrimary
+                    : colors.onSurface + '99',
+                },
+              ]}
+              numberOfLines={1}
+            >
+              {label.toUpperCase()}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
