@@ -14,9 +14,9 @@ const SettingsContext = createContext<SettingsContextValue>({
   settings: {
     displayName: '',
     dateJoined: '',
-    activeThemeId: 'light',
+    activeThemeId: 'vibrant-sanctuary',
   },
-  theme: getThemeById('light'),
+  theme: getThemeById('vibrant-sanctuary'),
   ready: false,
   updateSettings: async () => {},
 });
@@ -25,7 +25,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<UserSettings>({
     displayName: '',
     dateJoined: '',
-    activeThemeId: 'light',
+    activeThemeId: 'vibrant-sanctuary',
   });
   const [ready, setReady] = useState(false);
 

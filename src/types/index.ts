@@ -1,6 +1,7 @@
 // ── Theme ─────────────────────────────────────────────────────────────────────
 
 export interface ThemeColors {
+  // ── Legacy tokens (used by existing screens) ──
   bg: string;
   card: string;
   text: string;
@@ -13,12 +14,50 @@ export interface ThemeColors {
   accent: string;
   dangerBg: string;
   dangerText: string;
+
+  // ── Design-system surface layers ──
+  surface: string;
+  surfaceContainerLowest: string;   // #ffffff – floating cards
+  surfaceContainerLow: string;      // #f5f3ef – section backgrounds
+  surfaceContainer: string;         // #efeeea – hover states
+  surfaceContainerHigh: string;     // #eae8e4 – elevated surfaces
+  surfaceContainerHighest: string;  // #e4e2de – high-density areas
+
+  // ── Design-system color roles ──
+  onSurface: string;
+  onSurfaceVariant: string;
+  primaryContainer: string;
+  onPrimary: string;
+  onPrimaryContainer: string;
+  secondary: string;
+  secondaryContainer: string;
+  onSecondary: string;
+  tertiary: string;
+  tertiaryContainer: string;
+  onTertiary: string;
+  tertiaryFixed: string;
+  tertiaryFixedDim: string;
+  secondaryFixed: string;
+  outline: string;
+  outlineVariant: string;
+  error: string;
+  errorContainer: string;
+  onError: string;
+  inverseSurface: string;
+  inverseOnSurface: string;
+}
+
+/** Display metadata for theme selection cards */
+export interface ThemePreview {
+  swatch: [string, string, string]; // three preview colors
+  subtitle: string;
 }
 
 export interface Theme {
   id: string;
   name: string;
   colors: ThemeColors;
+  preview: ThemePreview;
 }
 
 // ── Mood ──────────────────────────────────────────────────────────────────────

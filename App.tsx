@@ -3,8 +3,21 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
-import { Text } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  useFonts,
+  Newsreader_400Regular,
+  Newsreader_400Regular_Italic,
+  Newsreader_600SemiBold_Italic,
+  Newsreader_700Bold_Italic,
+} from '@expo-google-fonts/newsreader';
+import {
+  Manrope_400Regular,
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+  Manrope_700Bold,
+} from '@expo-google-fonts/manrope';
 
 import { MoodProvider } from './src/context/MoodContext';
 import { SchedulerProvider } from './src/context/SchedulerContext';
@@ -19,36 +32,48 @@ import TemplateEditorScreen from './src/screens/TemplateEditorScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-function TabIcon({ label }: { label: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    Dashboard: '🏠',
-    Journal: '📓',
-    Calendar: '📅',
-    Scheduler: '🗓️',
-    Settings: '⚙️',
-  };
-  return <Text style={{ fontSize: 20 }}>{icons[label] ?? '•'}</Text>;
-}
-
 function MainTabs() {
   const { colors } = useTheme();
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerStyle: { backgroundColor: colors.headerBg },
-        headerTintColor: colors.headerText,
-        headerTitleStyle: { fontWeight: '700' },
-        tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.border },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.muted,
-        tabBarIcon: ({ focused }) => <TabIcon label={route.name} focused={focused} />,
-      })}
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.surface,
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+        headerTintColor: colors.primary,
+        headerTitleStyle: {
+          fontFamily: 'Newsreader_600SemiBold_Italic',
+          fontSize: 22,
+          color: colors.primary,
+        },
+        tabBarStyle: {
+          backgroundColor: colors.surface + 'CC',
+          borderTopWidth: 0,
+          elevation: 0,
+          position: 'absolute',
+          paddingTop: 4,
+        },
+        tabBarActiveTintColor: colors.primaryContainer,
+        tabBarInactiveTintColor: colors.onSurface + 'B3',
+        tabBarLabelStyle: {
+          fontFamily: 'Manrope_600SemiBold',
+          fontSize: 11,
+          letterSpacing: 0.5,
+          textTransform: 'uppercase',
+        },
+      }}
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Journal" component={JournalScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
       <Tab.Screen name="Scheduler" component={SchedulerScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ headerShown: false }}
+      />
     </Tab.Navigator>
   );
 }
@@ -57,7 +82,7 @@ function AppNavigator() {
   const { colors } = useTheme();
   return (
     <NavigationContainer>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <Stack.Navigator
         screenOptions={{
           headerStyle: { backgroundColor: colors.headerBg },
@@ -73,6 +98,25 @@ function AppNavigator() {
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Newsreader_400Regular,
+    Newsreader_400Regular_Italic,
+    Newsreader_600SemiBold_Italic,
+    Newsreader_700Bold_Italic,
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SettingsProvider>

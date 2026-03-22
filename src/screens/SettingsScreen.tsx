@@ -69,6 +69,7 @@ export default function SettingsScreen() {
 
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(settings.displayName);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   // --- derived stats ---
   const streak = useMemo(
@@ -114,12 +115,6 @@ export default function SettingsScreen() {
     setEditingName(false);
   };
 
-  const toggleTheme = () => {
-    const currentIdx = BUILT_IN_THEMES.findIndex((t) => t.id === settings.activeThemeId);
-    const nextIdx = (currentIdx + 1) % BUILT_IN_THEMES.length;
-    updateSettings({ activeThemeId: BUILT_IN_THEMES[nextIdx].id });
-  };
-
   const confirmClearData = () => {
     Alert.alert(
       'Clear All Data',
@@ -139,137 +134,541 @@ export default function SettingsScreen() {
   };
 
   /* ---------------------------------------------------------------- */
-  /*  Render helpers                                                   */
-  /* ---------------------------------------------------------------- */
-
-  const SectionHeader = ({ title }: { title: string }) => (
-    <Text style={[styles.sectionHeader, { color: colors.primary }]}>{title}</Text>
-  );
-
-  const Row = ({
-    label,
-    value,
-    onPress,
-  }: {
-    label: string;
-    value: string;
-    onPress?: () => void;
-  }) => {
-    const inner = (
-      <View style={[styles.row, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-        <Text style={[styles.rowLabel, { color: colors.text }]}>{label}</Text>
-        <Text style={[styles.rowValue, { color: colors.muted }]}>{value}</Text>
-      </View>
-    );
-    if (onPress) {
-      return <TouchableOpacity onPress={onPress}>{inner}</TouchableOpacity>;
-    }
-    return inner;
-  };
-
-  /* ---------------------------------------------------------------- */
   /*  Main render                                                      */
   /* ---------------------------------------------------------------- */
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.bg }]}>
-      {/* ---- Profile section ---- */}
-      <SectionHeader title="PROFILE" />
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-        {editingName ? (
-          <View style={styles.nameEditRow}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.surface }]}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/*  Hero — Appearance                                            */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+
+      <View style={styles.heroSection}>
+        <Text
+          style={[
+            styles.sectionLabel,
+            { color: colors.secondary },
+          ]}
+        >
+          PERSONALIZATION
+        </Text>
+        <Text
+          style={[
+            styles.heroTitle,
+            { color: colors.primary },
+          ]}
+        >
+          Appearance
+        </Text>
+      </View>
+
+      {/* Theme grid — 2 columns */}
+      <View style={styles.themeGrid}>
+        {BUILT_IN_THEMES.map((t) => {
+          const isActive = settings.activeThemeId === t.id;
+          return (
+            <TouchableOpacity
+              key={t.id}
+              activeOpacity={0.7}
+              style={[
+                styles.themeCard,
+                {
+                  backgroundColor: isActive
+                    ? colors.surfaceContainerLowest
+                    : colors.surfaceContainerLow,
+                  borderWidth: isActive ? 2 : 1,
+                  borderColor: isActive
+                    ? colors.primaryContainer
+                    : colors.outlineVariant + '1A',
+                },
+              ]}
+              onPress={() => updateSettings({ activeThemeId: t.id })}
+            >
+              {/* Checkmark indicator */}
+              {isActive && (
+                <View
+                  style={[
+                    styles.checkmarkBadge,
+                    { backgroundColor: colors.primaryContainer },
+                  ]}
+                >
+                  <Text style={[styles.checkmarkText, { color: colors.onPrimary }]}>
+                    {'✓'}
+                  </Text>
+                </View>
+              )}
+
+              {/* Swatch row */}
+              <View style={styles.swatchRow}>
+                {t.preview.swatch.map((swatchColor, idx) => (
+                  <View
+                    key={idx}
+                    style={[
+                      styles.swatch,
+                      { backgroundColor: swatchColor },
+                    ]}
+                  />
+                ))}
+              </View>
+
+              {/* Theme name */}
+              <Text
+                style={[
+                  styles.themeCardName,
+                  { color: colors.onSurface },
+                ]}
+                numberOfLines={1}
+              >
+                {t.name}
+              </Text>
+
+              {/* Subtitle */}
+              <Text
+                style={[
+                  styles.themeCardSubtitle,
+                  { color: colors.onSurfaceVariant },
+                ]}
+                numberOfLines={1}
+              >
+                {t.preview.subtitle}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/*  Account & Security                                           */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+
+      <Text
+        style={[
+          styles.sectionHeader,
+          { color: colors.onSurface + '80' },
+        ]}
+      >
+        ACCOUNT & SECURITY
+      </Text>
+
+      {/* Profile Information */}
+      {editingName ? (
+        <View
+          style={[
+            styles.settingsRow,
+            { backgroundColor: colors.surfaceContainerLow + '66' },
+          ]}
+        >
+          <View style={styles.nameEditContainer}>
             <TextInput
               style={[
                 styles.nameInput,
-                { backgroundColor: colors.inputBg, color: colors.text, borderColor: colors.border },
+                {
+                  backgroundColor: colors.surfaceContainerLowest,
+                  color: colors.onSurface,
+                  borderColor: colors.outlineVariant + '33',
+                },
               ]}
               value={nameDraft}
               onChangeText={setNameDraft}
               placeholder="Enter your name"
-              placeholderTextColor={colors.muted}
+              placeholderTextColor={colors.onSurfaceVariant}
               autoFocus
               onSubmitEditing={saveName}
               returnKeyType="done"
             />
-            <TouchableOpacity style={[styles.saveBtn, { backgroundColor: colors.primary }]} onPress={saveName}>
-              <Text style={[styles.saveBtnText, { color: colors.headerText }]}>Save</Text>
+            <TouchableOpacity
+              style={[styles.saveButton, { backgroundColor: colors.primary }]}
+              onPress={saveName}
+            >
+              <Text style={[styles.saveButtonText, { color: colors.onPrimary }]}>
+                Save
+              </Text>
             </TouchableOpacity>
           </View>
-        ) : (
-          <Row
-            label="Display Name"
-            value={settings.displayName || 'Tap to set'}
-            onPress={() => {
-              setNameDraft(settings.displayName);
-              setEditingName(true);
-            }}
-          />
-        )}
-        <Row label="Date Joined" value={dateJoinedDisplay} />
-        <Row label="Member For" value={`${memberDays} day${memberDays !== 1 ? 's' : ''}`} />
-      </View>
-
-      {/* ---- Appearance section ---- */}
-      <SectionHeader title="APPEARANCE" />
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <TouchableOpacity onPress={toggleTheme}>
-          <View style={[styles.row, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-            <Text style={[styles.rowLabel, { color: colors.text }]}>Theme</Text>
-            <View style={styles.themeToggle}>
-              <Text style={[styles.rowValue, { color: colors.muted, marginRight: 8 }]}>
-                {theme.name}
-              </Text>
-              <View style={[styles.toggleTrack, { backgroundColor: colors.border }, settings.activeThemeId !== 'light' && { backgroundColor: colors.primary }]}>
-                <View style={[styles.toggleThumb, settings.activeThemeId !== 'light' && styles.toggleThumbActive]} />
-              </View>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      {/* ---- Stats section ---- */}
-      <SectionHeader title="STATS" />
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <Row label="Current Streak" value={`${streak} day${streak !== 1 ? 's' : ''}`} />
-        <Row
-          label="Today's Progress"
-          value={`${todayDone}/${todayBlocks} blocks`}
-        />
-        <Row label="Total Completions" value={`${totalCompletions}`} />
-        <Row label="Schedule Templates" value={`${templates.length}`} />
-        <Row label="Mood Entries" value={`${moodEntries.length}`} />
-      </View>
-
-      {/* ---- About section ---- */}
-      <SectionHeader title="ABOUT" />
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <Row label="App Name" value="Life Tracker" />
-        <Row label="Version" value="1.0.0" />
-        <Row label="Platform" value="Expo / React Native" />
-      </View>
-
-      {/* ---- Danger zone ---- */}
-      <SectionHeader title="DATA" />
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <TouchableOpacity onPress={confirmClearData}>
+        </View>
+      ) : (
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={[
+            styles.settingsRow,
+            { backgroundColor: colors.surfaceContainerLow + '66' },
+          ]}
+          onPress={() => {
+            setNameDraft(settings.displayName);
+            setEditingName(true);
+          }}
+        >
           <View
             style={[
-              styles.row,
+              styles.rowIcon,
+              { backgroundColor: colors.tertiaryFixedDim + '4D' },
+            ]}
+          />
+          <View style={styles.rowTextColumn}>
+            <Text style={[styles.rowTitle, { color: colors.onSurface }]}>
+              Profile Information
+            </Text>
+            <Text style={[styles.rowSubtitle, { color: colors.onSurfaceVariant }]}>
+              {settings.displayName || 'Tap to set your name'}
+            </Text>
+          </View>
+          <Text style={[styles.chevron, { color: colors.onSurfaceVariant }]}>
+            {'>'}
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      {/* Password & Security */}
+      <View
+        style={[
+          styles.settingsRow,
+          { backgroundColor: colors.surfaceContainerLow + '66', marginTop: 8 },
+        ]}
+      >
+        <View
+          style={[
+            styles.rowIcon,
+            { backgroundColor: colors.tertiaryFixed + '4D' },
+          ]}
+        />
+        <View style={styles.rowTextColumn}>
+          <Text style={[styles.rowTitle, { color: colors.onSurface }]}>
+            Password & Security
+          </Text>
+          <Text style={[styles.rowSubtitle, { color: colors.onSurfaceVariant }]}>
+            Joined {dateJoinedDisplay}
+          </Text>
+        </View>
+        <Text style={[styles.chevron, { color: colors.onSurfaceVariant }]}>
+          {'>'}
+        </Text>
+      </View>
+
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/*  Your Journey — Stats                                         */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+
+      <Text
+        style={[
+          styles.sectionHeader,
+          { color: colors.onSurface + '80' },
+        ]}
+      >
+        YOUR JOURNEY
+      </Text>
+
+      <View style={styles.statsGrid}>
+        {/* Streak */}
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: colors.surfaceContainerLow },
+          ]}
+        >
+          <Text style={[styles.statValue, { color: colors.primary }]}>
+            {streak}
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+            Day Streak
+          </Text>
+        </View>
+
+        {/* Today's Progress */}
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: colors.surfaceContainerLow },
+          ]}
+        >
+          <Text style={[styles.statValue, { color: colors.primary }]}>
+            {todayDone}/{todayBlocks}
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+            Today's Blocks
+          </Text>
+        </View>
+
+        {/* Total Completions */}
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: colors.surfaceContainerLow },
+          ]}
+        >
+          <Text style={[styles.statValue, { color: colors.primary }]}>
+            {totalCompletions}
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+            Completions
+          </Text>
+        </View>
+
+        {/* Templates */}
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: colors.surfaceContainerLow },
+          ]}
+        >
+          <Text style={[styles.statValue, { color: colors.primary }]}>
+            {templates.length}
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+            Templates
+          </Text>
+        </View>
+
+        {/* Mood Entries */}
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: colors.surfaceContainerLow },
+          ]}
+        >
+          <Text style={[styles.statValue, { color: colors.primary }]}>
+            {moodEntries.length}
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+            Mood Entries
+          </Text>
+        </View>
+
+        {/* Member Days */}
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: colors.surfaceContainerLow },
+          ]}
+        >
+          <Text style={[styles.statValue, { color: colors.primary }]}>
+            {memberDays}
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.onSurfaceVariant }]}>
+            {memberDays === 1 ? 'Day Active' : 'Days Active'}
+          </Text>
+        </View>
+      </View>
+
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/*  Preferences                                                  */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+
+      <Text
+        style={[
+          styles.sectionHeader,
+          { color: colors.onSurface + '80' },
+        ]}
+      >
+        PREFERENCES
+      </Text>
+
+      {/* Push Notifications */}
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={[
+          styles.settingsRow,
+          { backgroundColor: colors.surfaceContainerLow + '66' },
+        ]}
+        onPress={() => setNotificationsEnabled((prev) => !prev)}
+      >
+        <View
+          style={[
+            styles.rowIcon,
+            { backgroundColor: colors.tertiaryFixedDim + '4D' },
+          ]}
+        />
+        <View style={styles.rowTextColumn}>
+          <Text style={[styles.rowTitle, { color: colors.onSurface }]}>
+            Push Notifications
+          </Text>
+          <Text style={[styles.rowSubtitle, { color: colors.onSurfaceVariant }]}>
+            {notificationsEnabled ? 'Enabled' : 'Disabled'}
+          </Text>
+        </View>
+
+        {/* Custom toggle */}
+        <View
+          style={[
+            styles.toggleTrack,
+            {
+              backgroundColor: notificationsEnabled
+                ? colors.primary
+                : colors.outlineVariant,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.toggleThumb,
               {
-                backgroundColor: colors.dangerBg,
-                borderBottomColor: colors.border,
+                transform: [
+                  { translateX: notificationsEnabled ? 22 : 0 },
+                ],
               },
             ]}
+          />
+        </View>
+      </TouchableOpacity>
+
+      {/* Privacy Policy */}
+      <View
+        style={[
+          styles.settingsRow,
+          { backgroundColor: colors.surfaceContainerLow + '66', marginTop: 8 },
+        ]}
+      >
+        <View
+          style={[
+            styles.rowIcon,
+            { backgroundColor: colors.tertiaryFixed + '4D' },
+          ]}
+        />
+        <View style={styles.rowTextColumn}>
+          <Text style={[styles.rowTitle, { color: colors.onSurface }]}>
+            Privacy Policy
+          </Text>
+          <Text style={[styles.rowSubtitle, { color: colors.onSurfaceVariant }]}>
+            How we handle your data
+          </Text>
+        </View>
+        <Text style={[styles.chevron, { color: colors.onSurfaceVariant }]}>
+          {'>'}
+        </Text>
+      </View>
+
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/*  Data                                                         */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+
+      <Text
+        style={[
+          styles.sectionHeader,
+          { color: colors.onSurface + '80' },
+        ]}
+      >
+        DATA
+      </Text>
+
+      <TouchableOpacity
+        activeOpacity={0.7}
+        style={[
+          styles.settingsRow,
+          { backgroundColor: colors.errorContainer + '66' },
+        ]}
+        onPress={confirmClearData}
+      >
+        <View
+          style={[
+            styles.rowIcon,
+            { backgroundColor: colors.error + '26' },
+          ]}
+        />
+        <View style={styles.rowTextColumn}>
+          <Text style={[styles.rowTitle, { color: colors.error }]}>
+            Clear All Data
+          </Text>
+          <Text style={[styles.rowSubtitle, { color: colors.error + 'AA' }]}>
+            Permanently remove everything
+          </Text>
+        </View>
+        <Text style={[styles.chevron, { color: colors.error }]}>
+          {'>'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/*  Support Banner                                               */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+
+      <View
+        style={[
+          styles.supportBanner,
+          { backgroundColor: colors.primary },
+        ]}
+      >
+        {/* Decorative background element */}
+        <Text
+          style={[
+            styles.supportBannerDecor,
+            { color: colors.onPrimary },
+          ]}
+        >
+          {'?'}
+        </Text>
+
+        <Text
+          style={[
+            styles.supportBannerHeadline,
+            { color: colors.onPrimary },
+          ]}
+        >
+          Need a Guide?
+        </Text>
+        <Text
+          style={[
+            styles.supportBannerBody,
+            { color: colors.onPrimary },
+          ]}
+        >
+          Our team is here to help you make the most of your sanctuary. Reach out anytime.
+        </Text>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={[
+            styles.supportBannerButton,
+            { backgroundColor: colors.secondary },
+          ]}
+        >
+          <Text
+            style={[
+              styles.supportBannerButtonText,
+              { color: colors.onSecondary },
+            ]}
           >
-            <Text style={[styles.rowLabel, { color: colors.dangerText }]}>
-              Clear All Data
-            </Text>
-            <Text style={{ color: colors.dangerText, fontSize: 16 }}>{'>'}</Text>
-          </View>
+            Contact Support
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <View style={{ height: 48 }} />
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/*  About                                                        */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+
+      <View style={styles.aboutSection}>
+        <Text style={[styles.aboutAppName, { color: colors.onSurface }]}>
+          Life Tracker
+        </Text>
+        <Text style={[styles.aboutVersion, { color: colors.onSurfaceVariant }]}>
+          {'Version 1.0.0 \u00B7 Expo / React Native'}
+        </Text>
+      </View>
+
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/*  Logout Button                                                */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+
+      <View style={styles.logoutContainer}>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={styles.logoutButton}
+        >
+          <Text
+            style={[
+              styles.logoutText,
+              { color: colors.error },
+            ]}
+          >
+            LOG OUT OF SANCTUARY
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Bottom spacing for tab bar */}
+      <View style={{ height: 120 }} />
     </ScrollView>
   );
 }
@@ -279,72 +678,265 @@ export default function SettingsScreen() {
 /* ------------------------------------------------------------------ */
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  sectionHeader: {
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    marginTop: 24,
-    marginBottom: 6,
-    marginHorizontal: 16,
+  container: {
+    flex: 1,
   },
-  card: {
-    borderRadius: 12,
-    marginHorizontal: 16,
-    overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+  contentContainer: {
+    paddingHorizontal: 24,
+    paddingTop: 60,
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  rowLabel: { fontSize: 15, fontWeight: '500' },
-  rowValue: { fontSize: 15 },
 
-  // name editing
-  nameEditRow: {
+  /* ── Hero / Appearance ─────────────────────────────────────────── */
+
+  heroSection: {
+    marginBottom: 24,
+  },
+  sectionLabel: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 11,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  heroTitle: {
+    fontFamily: 'Newsreader_400Regular_Italic',
+    fontSize: 38,
+    lineHeight: 44,
+  },
+
+  /* ── Theme Grid ────────────────────────────────────────────────── */
+
+  themeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  themeCard: {
+    width: '48%',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 12,
+    position: 'relative',
+  },
+  checkmarkBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkmarkText: {
+    fontSize: 13,
+    fontFamily: 'Manrope_700Bold',
+    lineHeight: 16,
+  },
+  swatchRow: {
+    flexDirection: 'row',
+    marginBottom: 14,
+    gap: 8,
+  },
+  swatch: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+  },
+  themeCardName: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  themeCardSubtitle: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 11,
+  },
+
+  /* ── Section Headers ───────────────────────────────────────────── */
+
+  sectionHeader: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 11,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginTop: 40,
+    marginBottom: 20,
+  },
+
+  /* ── Settings Rows ─────────────────────────────────────────────── */
+
+  settingsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    borderRadius: 12,
+    padding: 16,
+  },
+  rowIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 8,
+    marginRight: 14,
+  },
+  rowTextColumn: {
+    flex: 1,
+  },
+  rowTitle: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 15,
+    marginBottom: 2,
+  },
+  rowSubtitle: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 12,
+  },
+  chevron: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 18,
+    marginLeft: 8,
+  },
+
+  /* ── Name Editing ──────────────────────────────────────────────── */
+
+  nameEditContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   nameInput: {
     flex: 1,
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     fontSize: 15,
+    fontFamily: 'Manrope_400Regular',
   },
-  saveBtn: {
-    marginLeft: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
+  saveButton: {
+    marginLeft: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 10,
   },
-  saveBtnText: { fontWeight: '600', fontSize: 14 },
+  saveButtonText: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 14,
+  },
 
-  // theme toggle
-  themeToggle: { flexDirection: 'row', alignItems: 'center' },
+  /* ── Toggle ────────────────────────────────────────────────────── */
+
   toggleTrack: {
-    width: 44,
-    height: 24,
-    borderRadius: 12,
+    width: 48,
+    height: 26,
+    borderRadius: 13,
     justifyContent: 'center',
-    paddingHorizontal: 2,
+    paddingHorizontal: 3,
   },
   toggleThumb: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
   },
-  toggleThumbActive: { alignSelf: 'flex-end' },
+
+  /* ── Stats Grid ────────────────────────────────────────────────── */
+
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  statCard: {
+    width: '48%',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 10,
+  },
+  statValue: {
+    fontFamily: 'Newsreader_700Bold_Italic',
+    fontSize: 28,
+    lineHeight: 34,
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontFamily: 'Manrope_500Medium',
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+
+  /* ── Support Banner ────────────────────────────────────────────── */
+
+  supportBanner: {
+    borderRadius: 16,
+    padding: 28,
+    marginTop: 40,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  supportBannerDecor: {
+    position: 'absolute',
+    right: -10,
+    bottom: -20,
+    fontSize: 140,
+    opacity: 0.06,
+    fontFamily: 'Newsreader_700Bold_Italic',
+    lineHeight: 150,
+  },
+  supportBannerHeadline: {
+    fontFamily: 'Newsreader_400Regular_Italic',
+    fontSize: 24,
+    marginBottom: 10,
+  },
+  supportBannerBody: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 13,
+    lineHeight: 20,
+    opacity: 0.9,
+    marginBottom: 20,
+  },
+  supportBannerButton: {
+    alignSelf: 'flex-start',
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  supportBannerButtonText: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 13,
+  },
+
+  /* ── About ─────────────────────────────────────────────────────── */
+
+  aboutSection: {
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  aboutAppName: {
+    fontFamily: 'Newsreader_600SemiBold_Italic',
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  aboutVersion: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 12,
+  },
+
+  /* ── Logout ────────────────────────────────────────────────────── */
+
+  logoutContainer: {
+    alignItems: 'center',
+    marginTop: 32,
+  },
+  logoutButton: {
+    borderRadius: 24,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+  },
+  logoutText: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 11,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+  },
 });
