@@ -4,9 +4,9 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   Alert,
   ScrollView,
+  Switch,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useScheduler } from '../context/SchedulerContext';
@@ -14,17 +14,16 @@ import { useTheme } from '../context/SettingsContext';
 import { deleteTemplate, assignWeekday, loadAssignments } from '../storage/scheduler';
 import { formatTime } from '../utils/dates';
 import { ScheduleTemplate } from '../types';
+import ScreenHeader from '../components/ScreenHeader';
+
+// ── Constants ───────────────────────────────────────────────────────────────
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-// Palette of accent colors for template cards
-const TEMPLATE_COLORS = [
-  '#1a237e', '#00695c', '#4a148c', '#bf360c', '#1565c0', '#558b2f', '#6a1b9a',
-];
+/** Accent colors for timeline dots — cycles through primary, secondary, tertiary. */
+const DOT_COLORS_KEYS = ['primary', 'secondary', 'tertiary'] as const;
 
-function templateColor(index: number): string {
-  return TEMPLATE_COLORS[index % TEMPLATE_COLORS.length];
-}
+// ── Component ───────────────────────────────────────────────────────────────
 
 export default function SchedulerScreen() {
   const navigation = useNavigation<any>();
@@ -32,7 +31,7 @@ export default function SchedulerScreen() {
   const { colors } = useTheme();
   const [assigningDow, setAssigningDow] = useState<number | null>(null);
 
-  // ── Template CRUD ──────────────────────────────────────────────────────────
+  // ── Template CRUD ─────────────────────────────────────────────────────────
 
   const confirmDeleteTemplate = (template: ScheduleTemplate) => {
     Alert.alert('Delete Template', `Delete "${template.name}"?`, [
@@ -41,8 +40,6 @@ export default function SchedulerScreen() {
         text: 'Delete',
         style: 'destructive',
         onPress: async () => {
-          // deleteTemplate also cleans up any assignments pointing to this
-          // template, so we reload assignments from storage afterwards.
           const nextTemplates = await deleteTemplate(template.id);
           const nextAssignments = await loadAssignments();
           setTemplates(nextTemplates);
@@ -52,7 +49,7 @@ export default function SchedulerScreen() {
     ]);
   };
 
-  // ── Day-of-week assignment ─────────────────────────────────────────────────
+  // ── Day-of-week assignment ────────────────────────────────────────────────
 
   const handleDowPress = (dow: number) => {
     setAssigningDow(assigningDow === dow ? null : dow);
@@ -69,307 +66,588 @@ export default function SchedulerScreen() {
     return templates.find((t) => t.id === tid);
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+    <View style={[styles.root, { backgroundColor: colors.surface }]}>
+      <ScreenHeader showPageName="Scheduler" />
 
-        {/* ── Header ── */}
-        <View style={[styles.headerBlock, { backgroundColor: colors.headerBg }]}>
-          <Text style={[styles.headerTitle, { color: colors.headerText }]}>Daily Scheduler</Text>
-          <Text style={[styles.headerSub, { color: colors.muted }]}>Build templates and assign them to days</Text>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Editorial Header ── */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={[styles.eyebrow, { color: colors.outline }]}>
+                MORNING ROUTINE
+              </Text>
+              <Text style={[styles.headerTitle, { color: colors.onSurface }]}>
+                Daily Blueprint
+              </Text>
+            </View>
+          </View>
         </View>
 
-        {/* ── Weekly Assignment Grid ── */}
-        <Text style={[styles.sectionLabel, { color: colors.primary }]}>Weekly Defaults</Text>
-        <Text style={[styles.sectionHint, { color: colors.muted }]}>Tap a day to assign a template</Text>
-        <View style={styles.dowGrid}>
-          {DAY_LABELS.map((label, dow) => {
-            const assigned = getAssignedTemplate(dow);
-            const colorIdx = assigned ? templates.indexOf(assigned) : -1;
-            const isSelecting = assigningDow === dow;
-            return (
-              <TouchableOpacity
-                key={dow}
-                style={[
-                  styles.dowCell,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                  assigned && { backgroundColor: templateColor(colorIdx), borderColor: templateColor(colorIdx) },
-                  isSelecting && [styles.dowCellSelecting, { borderColor: colors.primary }],
-                ]}
-                onPress={() => handleDowPress(dow)}
-              >
-                <Text style={[styles.dowLabel, { color: colors.primary }, assigned && [styles.dowLabelAssigned, { color: colors.headerText }]]}>{label}</Text>
-                {assigned ? (
-                  <Text style={[styles.dowTemplateName, { color: colors.headerText }]} numberOfLines={1}>{assigned.name}</Text>
-                ) : (
-                  <Text style={[styles.dowEmpty, { color: colors.muted }]}>—</Text>
-                )}
-              </TouchableOpacity>
-            );
-          })}
+        {/* ── Weekly Assignment Strip ── */}
+        <View style={styles.weekSection}>
+          <Text style={[styles.sectionLabel, { color: colors.onSurfaceVariant }]}>
+            WEEKLY DEFAULTS
+          </Text>
+          <Text style={[styles.sectionHint, { color: colors.outline }]}>
+            Tap a day to assign a template
+          </Text>
+          <View style={styles.dowGrid}>
+            {DAY_LABELS.map((label, dow) => {
+              const assigned = getAssignedTemplate(dow);
+              const isSelecting = assigningDow === dow;
+              return (
+                <TouchableOpacity
+                  key={dow}
+                  style={[
+                    styles.dowCell,
+                    { backgroundColor: colors.surfaceContainerLow },
+                    assigned && { backgroundColor: colors.primaryContainer },
+                    isSelecting && { borderWidth: 2, borderColor: colors.primary },
+                  ]}
+                  onPress={() => handleDowPress(dow)}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.dowLabel,
+                      { color: colors.onSurfaceVariant },
+                      assigned && { color: colors.onPrimary },
+                    ]}
+                  >
+                    {label}
+                  </Text>
+                  {assigned ? (
+                    <Text
+                      style={[styles.dowTemplateName, { color: colors.onPrimary }]}
+                      numberOfLines={1}
+                    >
+                      {assigned.name}
+                    </Text>
+                  ) : (
+                    <Text style={[styles.dowEmpty, { color: colors.outline }]}>{'\u2014'}</Text>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
 
         {/* Template picker for selected day */}
         {assigningDow !== null && (
-          <View style={[styles.pickerPanel, { backgroundColor: colors.card }]}>
+          <View
+            style={[
+              styles.pickerPanel,
+              {
+                backgroundColor: colors.surfaceContainerLowest,
+                shadowColor: colors.onSurface,
+              },
+            ]}
+          >
             <Text style={[styles.pickerTitle, { color: colors.primary }]}>
               Assign template to {DAY_LABELS[assigningDow]}
             </Text>
             {templates.length === 0 ? (
-              <Text style={[styles.pickerEmpty, { color: colors.muted }]}>No templates yet. Create one below.</Text>
+              <Text style={[styles.pickerEmpty, { color: colors.onSurfaceVariant }]}>
+                No templates yet. Create one below.
+              </Text>
             ) : (
-              templates.map((t, idx) => (
-                <TouchableOpacity
-                  key={t.id}
-                  style={[styles.pickerRow, { borderLeftColor: templateColor(idx), backgroundColor: colors.inputBg }]}
-                  onPress={() => handleAssignTemplate(assigningDow, t.id)}
-                >
-                  <Text style={[styles.pickerRowName, { color: colors.text }]}>{t.name}</Text>
-                  <Text style={[styles.pickerRowMeta, { color: colors.muted }]}>{t.blocks.length} block{t.blocks.length !== 1 ? 's' : ''}</Text>
-                </TouchableOpacity>
-              ))
+              templates.map((t, idx) => {
+                const dotColor = colors[DOT_COLORS_KEYS[idx % DOT_COLORS_KEYS.length]];
+                return (
+                  <TouchableOpacity
+                    key={t.id}
+                    style={[
+                      styles.pickerRow,
+                      { borderLeftColor: dotColor, backgroundColor: colors.surfaceContainerLow },
+                    ]}
+                    onPress={() => handleAssignTemplate(assigningDow, t.id)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.pickerRowName, { color: colors.onSurface }]}>
+                      {t.name}
+                    </Text>
+                    <Text style={[styles.pickerRowMeta, { color: colors.onSurfaceVariant }]}>
+                      {t.blocks.length} block{t.blocks.length !== 1 ? 's' : ''}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })
             )}
             {assignments.weekdays[String(assigningDow)] && (
               <TouchableOpacity
-                style={[styles.clearBtn, { backgroundColor: colors.dangerBg }]}
+                style={[styles.clearBtn, { backgroundColor: colors.errorContainer + '66' }]}
                 onPress={() => handleAssignTemplate(assigningDow, null)}
+                activeOpacity={0.7}
               >
-                <Text style={[styles.clearBtnText, { color: colors.dangerText }]}>Clear assignment</Text>
+                <Text style={[styles.clearBtnText, { color: colors.error }]}>Clear assignment</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: colors.bg }]} onPress={() => setAssigningDow(null)}>
-              <Text style={[styles.cancelBtnText, { color: colors.muted }]}>Cancel</Text>
+            <TouchableOpacity
+              style={[styles.cancelBtn, { backgroundColor: colors.surfaceContainerLow }]}
+              onPress={() => setAssigningDow(null)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.cancelBtnText, { color: colors.onSurfaceVariant }]}>Cancel</Text>
             </TouchableOpacity>
           </View>
         )}
 
-        {/* ── Templates list ── */}
-        <View style={styles.sectionRow}>
-          <Text style={[styles.sectionLabel, { color: colors.primary }]}>Templates</Text>
+        {/* ── Templates — Timeline Layout ── */}
+        <View style={styles.templatesSection}>
+          <Text style={[styles.sectionLabel, { color: colors.onSurfaceVariant }]}>
+            TEMPLATES
+          </Text>
         </View>
 
         {templates.length === 0 ? (
-          <View style={[styles.emptyCard, { backgroundColor: colors.card }]}>
-            <Text style={[styles.emptyText, { color: colors.muted }]}>No templates yet.</Text>
-            <Text style={[styles.emptyHint, { color: colors.muted }]}>Tap + below to create your first schedule template.</Text>
+          <View
+            style={[
+              styles.emptyCard,
+              {
+                backgroundColor: colors.surfaceContainerLowest,
+                shadowColor: colors.onSurface,
+              },
+            ]}
+          >
+            <Text style={[styles.emptyText, { color: colors.onSurfaceVariant }]}>
+              No templates yet.
+            </Text>
+            <Text style={[styles.emptyHint, { color: colors.outline }]}>
+              Tap + below to create your first schedule template.
+            </Text>
           </View>
         ) : (
-          templates.map((template, idx) => {
-            const color = templateColor(idx);
-            const sortedBlocks = [...template.blocks].sort((a, b) =>
-              a.startTime.localeCompare(b.startTime)
-            );
-            return (
-              <View key={template.id} style={[styles.templateCard, { backgroundColor: colors.card, borderLeftColor: color }]}>
-                <View style={styles.templateCardHeader}>
-                  <Text style={[styles.templateName, { color }]}>{template.name}</Text>
-                  <View style={styles.templateActions}>
-                    <TouchableOpacity
-                      style={[styles.actionBtn, { backgroundColor: colors.border }]}
-                      onPress={() => navigation.navigate('TemplateEditor', { template })}
-                    >
-                      <Text style={[styles.actionBtnText, { color: colors.primary }]}>Edit</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.actionBtn, styles.actionBtnDelete, { backgroundColor: colors.dangerBg }]}
-                      onPress={() => confirmDeleteTemplate(template)}
-                    >
-                      <Text style={[styles.actionBtnText, styles.actionBtnDeleteText, { color: colors.dangerText }]}>Delete</Text>
-                    </TouchableOpacity>
+          <View style={styles.timeline}>
+            {/* Vertical timeline line */}
+            <View style={[styles.timelineLine, { backgroundColor: colors.outlineVariant + '4D' }]} />
+
+            {templates.map((template, tIdx) => {
+              const dotColorKey = DOT_COLORS_KEYS[tIdx % DOT_COLORS_KEYS.length];
+              const dotColor = colors[dotColorKey];
+              const sortedBlocks = [...template.blocks].sort((a, b) =>
+                a.startTime.localeCompare(b.startTime),
+              );
+              const bgStyle =
+                tIdx % 2 === 0
+                  ? { backgroundColor: colors.surfaceContainerLow }
+                  : {
+                      backgroundColor: colors.surfaceContainerLowest,
+                      borderWidth: 1,
+                      borderColor: colors.outlineVariant + '1A',
+                      shadowColor: colors.onSurface,
+                      shadowOpacity: 0.02,
+                      shadowRadius: 20,
+                      shadowOffset: { width: 0, height: 4 },
+                    };
+
+              return (
+                <View key={template.id} style={styles.timelineItem}>
+                  {/* Dot */}
+                  <View
+                    style={[
+                      styles.timelineDot,
+                      {
+                        backgroundColor: dotColor,
+                        borderColor: colors.surface,
+                      },
+                    ]}
+                  />
+
+                  {/* Card */}
+                  <View style={[styles.timelineCard, bgStyle]}>
+                    <View style={styles.cardHeader}>
+                      <View style={styles.cardHeaderLeft}>
+                        <Text style={[styles.cardTimeLabel, { color: dotColor }]}>
+                          {sortedBlocks.length > 0
+                            ? `${formatTime(sortedBlocks[0].startTime)} – ${formatTime(sortedBlocks[sortedBlocks.length - 1].endTime)}`
+                            : 'No blocks'}
+                        </Text>
+                        <Text style={[styles.cardTitle, { color: colors.onSurface }]}>
+                          {template.name}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        onPress={() => navigation.navigate('TemplateEditor', { template })}
+                      >
+                        <Text style={[styles.moreIcon, { color: colors.outline }]}>
+                          {'\u22EE'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* Block preview list */}
+                    {sortedBlocks.slice(0, 3).map((block) => (
+                      <View key={block.id} style={styles.blockPreviewRow}>
+                        <Text style={[styles.blockPreviewTime, { color: colors.onSurfaceVariant }]}>
+                          {formatTime(block.startTime)} – {formatTime(block.endTime)}
+                        </Text>
+                        <Text
+                          style={[styles.blockPreviewActivity, { color: colors.onSurface }]}
+                          numberOfLines={1}
+                        >
+                          {block.activity}
+                        </Text>
+                      </View>
+                    ))}
+                    {sortedBlocks.length > 3 && (
+                      <Text style={[styles.blockMore, { color: colors.onSurfaceVariant }]}>
+                        +{sortedBlocks.length - 3} more...
+                      </Text>
+                    )}
+
+                    {/* Tags */}
+                    <View style={styles.tagRow}>
+                      <View style={[styles.tag, { backgroundColor: dotColor + '0D' }]}>
+                        <Text style={[styles.tagText, { color: dotColor }]}>
+                          {sortedBlocks.length} Block{sortedBlocks.length !== 1 ? 's' : ''}
+                        </Text>
+                      </View>
+                      {sortedBlocks.some((b) => b.tracked) && (
+                        <View style={[styles.tag, { backgroundColor: colors.tertiary + '0D' }]}>
+                          <Text style={[styles.tagText, { color: colors.tertiary }]}>Tracked</Text>
+                        </View>
+                      )}
+                    </View>
+
+                    {/* Actions */}
+                    <View style={styles.cardActions}>
+                      <TouchableOpacity
+                        style={[styles.actionBtn, { backgroundColor: colors.surfaceContainerHigh }]}
+                        onPress={() => navigation.navigate('TemplateEditor', { template })}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[styles.actionBtnText, { color: colors.primary }]}>Edit</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.actionBtn, { backgroundColor: colors.errorContainer + '66' }]}
+                        onPress={() => confirmDeleteTemplate(template)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[styles.actionBtnText, { color: colors.error }]}>Delete</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
-                <Text style={[styles.templateBlockCount, { color: colors.muted }]}>
-                  {template.blocks.length} time block{template.blocks.length !== 1 ? 's' : ''}
-                </Text>
-                {sortedBlocks.slice(0, 3).map((block) => (
-                  <View key={block.id} style={styles.blockPreviewRow}>
-                    <Text style={[styles.blockPreviewTime, { color: colors.muted }]}>
-                      {formatTime(block.startTime)} – {formatTime(block.endTime)}
-                    </Text>
-                    <Text style={[styles.blockPreviewActivity, { color: colors.text }]} numberOfLines={1}>
-                      {block.activity}
-                    </Text>
-                  </View>
-                ))}
-                {sortedBlocks.length > 3 && (
-                  <Text style={[styles.blockPreviewMore, { color: colors.muted }]}>
-                    +{sortedBlocks.length - 3} more…
-                  </Text>
-                )}
-              </View>
-            );
-          })
+              );
+            })}
+          </View>
         )}
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: 120 }} />
       </ScrollView>
 
       {/* FAB */}
       <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.primary }]}
         onPress={() => navigation.navigate('TemplateEditor', {})}
+        activeOpacity={0.8}
       >
-        <Text style={[styles.fabText, { color: colors.headerText }]}>+</Text>
+        <Text style={[styles.fabIcon, { color: colors.onPrimary }]}>+</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }
 
+// ── Styles ───────────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scroll: { padding: 16 },
-
-  headerBlock: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
+  root: {
+    flex: 1,
   },
-  headerTitle: { fontSize: 24, fontWeight: '700' },
-  headerSub: { fontSize: 13, marginTop: 4 },
+  scroll: {
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
 
-  sectionLabel: {
-    fontSize: 13,
-    fontWeight: '700',
+  // ── Header ──
+  headerSection: {
+    marginBottom: 32,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  eyebrow: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 11,
+    letterSpacing: 3,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginBottom: 6,
-    marginTop: 4,
+    marginBottom: 4,
   },
-  sectionHint: { fontSize: 12, marginBottom: 10 },
-  sectionRow: { flexDirection: 'row', alignItems: 'center', marginTop: 20, marginBottom: 6 },
+  headerTitle: {
+    fontFamily: 'Newsreader_400Regular_Italic',
+    fontSize: 36,
+    lineHeight: 42,
+  },
 
-  // Day-of-week grid
+  // ── Week strip ──
+  weekSection: {
+    marginBottom: 24,
+  },
+  sectionLabel: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 10,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginBottom: 6,
+  },
+  sectionHint: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 12,
+    marginBottom: 12,
+  },
   dowGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 4,
+    gap: 6,
   },
   dowCell: {
-    width: '13%',
-    minWidth: 42,
     flex: 1,
+    minWidth: 42,
     alignItems: 'center',
     paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1.5,
+    borderRadius: 12,
   },
-  dowCellSelecting: {
-    borderWidth: 2,
+  dowLabel: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 10,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  dowLabel: { fontSize: 11, fontWeight: '700' },
-  dowLabelAssigned: {},
-  dowTemplateName: { fontSize: 9, marginTop: 2, textAlign: 'center' },
-  dowEmpty: { fontSize: 14, marginTop: 2 },
+  dowTemplateName: {
+    fontFamily: 'Manrope_500Medium',
+    fontSize: 8,
+    marginTop: 3,
+    textAlign: 'center',
+  },
+  dowEmpty: {
+    fontSize: 14,
+    marginTop: 2,
+  },
 
-  // Template picker panel
+  // ── Picker Panel ──
   pickerPanel: {
-    borderRadius: 14,
-    padding: 16,
-    marginTop: 10,
-    marginBottom: 6,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
   },
-  pickerTitle: { fontSize: 14, fontWeight: '700', marginBottom: 12 },
-  pickerEmpty: { fontSize: 13, marginBottom: 8 },
+  pickerTitle: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  pickerEmpty: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 13,
+    marginBottom: 8,
+  },
   pickerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
     borderLeftWidth: 4,
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 8,
   },
-  pickerRowName: { fontSize: 14, fontWeight: '600' },
-  pickerRowMeta: { fontSize: 12 },
+  pickerRowName: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 14,
+  },
+  pickerRowMeta: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 12,
+  },
   clearBtn: {
-    paddingVertical: 8,
+    paddingVertical: 10,
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 8,
   },
-  clearBtnText: { fontSize: 13, fontWeight: '600' },
+  clearBtnText: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 13,
+  },
   cancelBtn: {
-    paddingVertical: 8,
+    paddingVertical: 10,
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 10,
   },
-  cancelBtnText: { fontSize: 13, fontWeight: '600' },
+  cancelBtnText: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 13,
+  },
 
-  // Template cards
-  templateCard: {
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 12,
-    borderLeftWidth: 5,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+  // ── Templates Section ──
+  templatesSection: {
+    marginBottom: 16,
   },
-  templateCardHeader: {
+
+  // ── Timeline ──
+  timeline: {
+    position: 'relative',
+    paddingLeft: 28,
+  },
+  timelineLine: {
+    position: 'absolute',
+    left: 9,
+    top: 12,
+    bottom: 12,
+    width: 1,
+  },
+  timelineItem: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+  timelineDot: {
+    position: 'absolute',
+    left: -24,
+    top: 8,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 3,
+    zIndex: 2,
+  },
+  timelineCard: {
+    borderRadius: 16,
+    padding: 20,
+  },
+  cardHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    alignItems: 'flex-start',
+    marginBottom: 12,
   },
-  templateName: { fontSize: 17, fontWeight: '700', flex: 1 },
-  templateBlockCount: { fontSize: 12, marginBottom: 8 },
-  templateActions: { flexDirection: 'row', gap: 8 },
-  actionBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 8,
+  cardHeaderLeft: {
+    flex: 1,
   },
-  actionBtnText: { fontSize: 12, fontWeight: '600' },
-  actionBtnDelete: {},
-  actionBtnDeleteText: {},
+  cardTimeLabel: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 11,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  cardTitle: {
+    fontFamily: 'Newsreader_600SemiBold_Italic',
+    fontSize: 22,
+    marginTop: 4,
+  },
+  moreIcon: {
+    fontSize: 20,
+    paddingHorizontal: 4,
+  },
 
+  // ── Block Preview ──
   blockPreviewRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 3,
+    marginBottom: 4,
   },
   blockPreviewTime: {
+    fontFamily: 'Manrope_400Regular',
     fontSize: 11,
-    width: 130,
-    fontVariant: ['tabular-nums'],
+    width: 120,
   },
-  blockPreviewActivity: { fontSize: 12, flex: 1, fontWeight: '500' },
-  blockPreviewMore: { fontSize: 11, marginTop: 2 },
+  blockPreviewActivity: {
+    fontFamily: 'Manrope_500Medium',
+    fontSize: 12,
+    flex: 1,
+  },
+  blockMore: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 11,
+    marginTop: 2,
+    fontStyle: 'italic',
+  },
 
+  // ── Tags ──
+  tagRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+  },
+  tag: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  tagText: {
+    fontFamily: 'Manrope_700Bold',
+    fontSize: 9,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+
+  // ── Card Actions ──
+  cardActions: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 16,
+  },
+  actionBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  actionBtnText: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 12,
+  },
+
+  // ── Empty ──
   emptyCard: {
-    borderRadius: 14,
+    borderRadius: 16,
     padding: 28,
     alignItems: 'center',
-    marginTop: 8,
+    shadowOpacity: 0.02,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 0 },
   },
-  emptyText: { fontSize: 16, fontWeight: '600' },
-  emptyHint: { fontSize: 13, marginTop: 6, textAlign: 'center' },
+  emptyText: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 16,
+  },
+  emptyHint: {
+    fontFamily: 'Manrope_400Regular',
+    fontSize: 13,
+    marginTop: 6,
+    textAlign: 'center',
+  },
 
+  // ── FAB ──
   fab: {
     position: 'absolute',
-    bottom: 28,
+    bottom: 100,
     right: 24,
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 6,
     shadowColor: '#000',
     shadowOpacity: 0.2,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
   },
-  fabText: { fontSize: 28, fontWeight: '300', lineHeight: 32 },
+  fabIcon: {
+    fontSize: 28,
+    fontWeight: '300',
+    lineHeight: 32,
+  },
 });

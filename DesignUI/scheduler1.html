@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed": "#3c0800",
+                        "on-primary-container": "#a8e7c5",
+                        "primary": "#0f5238",
+                        "tertiary-fixed-dim": "#bec4f1",
+                        "surface-bright": "#fbf9f5",
+                        "background": "#fbf9f5",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f5f3ef",
+                        "tertiary-fixed": "#dee0ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#2c694e",
+                        "primary-container": "#2d6a4f",
+                        "on-primary-fixed": "#002114",
+                        "on-secondary-container": "#742814",
+                        "on-tertiary-fixed": "#12183c",
+                        "surface-variant": "#e4e2de",
+                        "secondary-fixed": "#ffdbd2",
+                        "surface": "#fbf9f5",
+                        "inverse-surface": "#30312e",
+                        "primary-fixed-dim": "#95d4b3",
+                        "on-primary-fixed-variant": "#0e5138",
+                        "inverse-primary": "#95d4b3",
+                        "inverse-on-surface": "#f2f0ed",
+                        "tertiary-container": "#575d84",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#bfc9c1",
+                        "secondary-container": "#fc9174",
+                        "secondary": "#9a442d",
+                        "primary-fixed": "#b1f0ce",
+                        "on-tertiary-container": "#d3d7ff",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#404943",
+                        "surface-container-highest": "#e4e2de",
+                        "surface-dim": "#dbdad6",
+                        "on-secondary-fixed-variant": "#7c2e19",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "outline": "#707973",
+                        "tertiary": "#3f456b",
+                        "on-surface": "#1b1c1a",
+                        "surface-container-high": "#eae8e4",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary-fixed-variant": "#3e446a",
+                        "secondary-fixed-dim": "#ffb4a1",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#efeeea"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader", "serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .headline-sm { font-size: 1.5rem; line-height: 2rem; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fbf9f5]/80 backdrop-blur-md flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer">menu</span>
+<h1 class="font-['Newsreader'] serif headline-sm tracking-tight italic text-primary">Sanctuary</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-['Newsreader'] text-2xl italic text-primary">Scheduler</span>
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-outline-variant/20">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Professional woman portrait for user profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB9K8aF_0VGxP3uUT-quqRS2JfJw1ikFiOqssAcjNQGpB6rLQsJ-XMkhGq1pVdhRZ5g05fTvhtkO-gXWjyqY2CODKNbOUneU2fxuJQ1pZScfJijdnRyfFj7WBbK6aRRHRTq4m3yS-eiAsZVQ7qS_igCvJzEApE-ekbUzu8C1KALmV1RFot9CHLbPj9h26xLci-Ls0NeY0byGeclhDTwlKlLUVtuZpBoOCcxmb5uQJhVgo90m1RmCWfdOXaeJge4ML8__Ub2lHBO-0"/>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<main class="pt-24 px-6 max-w-2xl mx-auto">
+<!-- Header Actions -->
+<section class="mb-12 flex justify-between items-end">
+<div>
+<p class="font-label text-xs uppercase tracking-[0.2em] text-outline mb-2">Morning Routine</p>
+<h2 class="font-headline text-4xl text-on-surface">Daily Blueprint</h2>
+</div>
+<button class="bg-secondary text-on-secondary px-5 py-2.5 rounded-xl font-body font-semibold text-sm flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">calendar_add_on</span>
+                Apply to Week
+            </button>
+</section>
+<!-- Timeline Section -->
+<div class="relative space-y-0">
+<!-- Timeline Line -->
+<div class="absolute left-[23px] top-4 bottom-4 w-[1px] bg-outline-variant/30"></div>
+<!-- Block 1 -->
+<div class="relative pl-14 pb-10">
+<div class="absolute left-4 top-1 w-4 h-4 rounded-full bg-primary border-4 border-surface ring-1 ring-primary/20"></div>
+<div class="bg-surface-container-low p-6 rounded-xl hover:bg-surface-container transition-colors duration-300">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="font-label text-xs font-bold text-primary tracking-widest uppercase">07:30 - 08:00</span>
+<h3 class="font-headline text-2xl mt-1">Walk Dogs</h3>
+</div>
+<div class="flex items-center gap-3">
+<label class="relative inline-flex items-center cursor-pointer">
+<span class="mr-3 text-[10px] font-label uppercase tracking-wider text-outline">Show on Dashboard</span>
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[16px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">more_vert</span>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="bg-primary/5 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Active</span>
+<span class="bg-tertiary/5 text-tertiary text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Outdoor</span>
+</div>
+</div>
+</div>
+<!-- Block 2 -->
+<div class="relative pl-14 pb-10">
+<div class="absolute left-4 top-1 w-4 h-4 rounded-full bg-secondary border-4 border-surface ring-1 ring-secondary/20"></div>
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10 shadow-[0_4px_40px_rgba(27,28,26,0.02)]">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="font-label text-xs font-bold text-secondary tracking-widest uppercase">08:30 - 12:30</span>
+<h3 class="font-headline text-2xl mt-1">Deep Work</h3>
+</div>
+<div class="flex items-center gap-3">
+<label class="relative inline-flex items-center cursor-pointer">
+<span class="mr-3 text-[10px] font-label uppercase tracking-wider text-outline">Show on Dashboard</span>
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[16px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">more_vert</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-sm mb-4 leading-relaxed italic">Focus on the editorial design overhaul for the autumn release.</p>
+<div class="flex gap-2">
+<span class="bg-secondary/5 text-secondary text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Priority</span>
+<span class="bg-tertiary/5 text-tertiary text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Focus</span>
+</div>
+</div>
+</div>
+<!-- Block 3 -->
+<div class="relative pl-14 pb-10">
+<div class="absolute left-4 top-1 w-4 h-4 rounded-full bg-tertiary border-4 border-surface ring-1 ring-tertiary/20"></div>
+<div class="bg-surface-container-low p-6 rounded-xl hover:bg-surface-container transition-colors duration-300">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="font-label text-xs font-bold text-tertiary tracking-widest uppercase">13:00 - 13:45</span>
+<h3 class="font-headline text-2xl mt-1">Lunch &amp; Read</h3>
+</div>
+<div class="flex items-center gap-3">
+<label class="relative inline-flex items-center cursor-pointer">
+<span class="mr-3 text-[10px] font-label uppercase tracking-wider text-outline">Show on Dashboard</span>
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[16px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-tertiary"></div>
+</label>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">more_vert</span>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="bg-tertiary/5 text-tertiary text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Personal</span>
+<span class="bg-primary/5 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Mindful</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-28 right-8 w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-xl shadow-xl flex items-center justify-center active:scale-95 transition-transform z-40">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full bg-[#fbf9f5]/80 backdrop-blur-md flex justify-around items-center px-4 pb-6 pt-2 z-50 shadow-[0_-4px_40px_rgba(27,28,26,0.04)] rounded-t-xl">
+<div class="flex flex-col items-center justify-center text-[#0f5238]/60 py-2 px-4 active:scale-90 transition-transform cursor-pointer">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-widest">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#0f5238]/60 py-2 px-4 active:scale-90 transition-transform cursor-pointer">
+<span class="material-symbols-outlined mb-1">auto_stories</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-widest">Journal</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#0f5238]/60 py-2 px-4 active:scale-90 transition-transform cursor-pointer">
+<span class="material-symbols-outlined mb-1">calendar_month</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-widest">Calendar</span>
+</div>
+<!-- ACTIVE TAB -->
+<div class="flex flex-col items-center justify-center bg-[#2d6a4f] text-white rounded-xl py-2 px-4 active:scale-90 transition-transform cursor-pointer">
+<span class="material-symbols-outlined mb-1">event_repeat</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-widest">Scheduler</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#0f5238]/60 py-2 px-4 active:scale-90 transition-transform cursor-pointer">
+<span class="material-symbols-outlined mb-1">settings</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-widest">Settings</span>
+</div>
+</nav>
+</body></html>

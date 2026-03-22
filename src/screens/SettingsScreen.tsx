@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
+import ScreenHeader from '../components/ScreenHeader';
 import { format, differenceInDays, parseISO, subDays } from 'date-fns';
 import { useSettings, useTheme } from '../context/SettingsContext';
 import { useScheduler } from '../context/SchedulerContext';
@@ -138,11 +139,13 @@ export default function SettingsScreen() {
   /* ---------------------------------------------------------------- */
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.surface }]}
-      contentContainerStyle={styles.contentContainer}
-      showsVerticalScrollIndicator={false}
-    >
+    <View style={[styles.rootContainer, { backgroundColor: colors.surface }]}>
+      <ScreenHeader />
+      <ScrollView
+        style={[styles.container, { backgroundColor: colors.surface }]}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
       {/* ══════════════════════════════════════════════════════════════ */}
       {/*  Hero — Appearance                                            */}
       {/* ══════════════════════════════════════════════════════════════ */}
@@ -669,7 +672,8 @@ export default function SettingsScreen() {
 
       {/* Bottom spacing for tab bar */}
       <View style={{ height: 120 }} />
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -681,9 +685,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  rootContainer: {
+    flex: 1,
+  },
   contentContainer: {
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 8,
   },
 
   /* ── Hero / Appearance ─────────────────────────────────────────── */

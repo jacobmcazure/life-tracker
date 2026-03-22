@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sanctuary - Calendar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#3c0800",
+              "on-primary-container": "#a8e7c5",
+              "primary": "#0f5238",
+              "tertiary-fixed-dim": "#bec4f1",
+              "surface-bright": "#fbf9f5",
+              "background": "#fbf9f5",
+              "on-primary": "#ffffff",
+              "surface-container-low": "#f5f3ef",
+              "tertiary-fixed": "#dee0ff",
+              "surface-container-lowest": "#ffffff",
+              "on-error": "#ffffff",
+              "surface-tint": "#2c694e",
+              "primary-container": "#2d6a4f",
+              "on-primary-fixed": "#002114",
+              "on-secondary-container": "#742814",
+              "on-tertiary-fixed": "#12183c",
+              "surface-variant": "#e4e2de",
+              "secondary-fixed": "#ffdbd2",
+              "surface": "#fbf9f5",
+              "inverse-surface": "#30312e",
+              "primary-fixed-dim": "#95d4b3",
+              "on-primary-fixed-variant": "#0e5138",
+              "inverse-primary": "#95d4b3",
+              "inverse-on-surface": "#f2f0ed",
+              "tertiary-container": "#575d84",
+              "on-error-container": "#93000a",
+              "outline-variant": "#bfc9c1",
+              "secondary-container": "#fc9174",
+              "secondary": "#9a442d",
+              "primary-fixed": "#b1f0ce",
+              "on-tertiary-container": "#d3d7ff",
+              "on-tertiary": "#ffffff",
+              "on-surface-variant": "#404943",
+              "surface-container-highest": "#e4e2de",
+              "surface-dim": "#dbdad6",
+              "on-secondary-fixed-variant": "#7c2e19",
+              "error": "#ba1a1a",
+              "error-container": "#ffdad6",
+              "outline": "#707973",
+              "tertiary": "#3f456b",
+              "on-surface": "#1b1c1a",
+              "surface-container-high": "#eae8e4",
+              "on-background": "#1b1c1a",
+              "on-tertiary-fixed-variant": "#3e446a",
+              "secondary-fixed-dim": "#ffb4a1",
+              "on-secondary": "#ffffff",
+              "surface-container": "#efeeea"
+            },
+            fontFamily: {
+              "headline": ["Newsreader", "serif"],
+              "body": ["Manrope", "sans-serif"],
+              "label": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Manrope', sans-serif;
+        background-color: #fbf9f5;
+        color: #1b1c1a;
+      }
+      .serif { font-family: 'Newsreader', serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fbf9f5]/80 backdrop-blur-md flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer">menu</span>
+<h1 class="font-['Newsreader'] italic text-2xl text-primary tracking-tight">Sanctuary</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-outline-variant/20">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Close up portrait of a smiling woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDadrGDHtaQ9iQXwgW6DT-TC43iktjmOIQQsj4TQNIlVsmbLbpFOI04J6BewY8nqFdYZsxR-J91uHB6TiVmqolIqRTYtPjA8mWQiD9_6pm7duQRLLkRM3cpD4bLBcNn9xmM8Avef_HcLt9MVPcf5YWnXXKhNAU4US7suKcJupZd_EfeVWrK06vFuhS8pnkLvamipvyn88A7KOwbOmI4frPfV2Vy7bOsqXDplA6um4Q0ySG3m3vMmno_oZU8u9v11zpjSNtSGLo2cAM"/>
+</div>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-4xl mx-auto">
+<!-- Editorial Header Section -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="space-y-1">
+<p class="font-label text-xs uppercase tracking-[0.2em] text-secondary font-bold">Mindful Rhythm</p>
+<h2 class="font-headline text-5xl md:text-6xl text-on-surface font-medium leading-none">October</h2>
+</div>
+<div class="flex items-center gap-6 pb-2">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-surface-container"></span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Low</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">High</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Calendar Heatmap Grid -->
+<section class="mb-12">
+<div class="grid grid-cols-7 gap-3">
+<!-- Days of Week -->
+<div class="text-center pb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-on-surface-variant/60">Sun</div>
+<div class="text-center pb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-on-surface-variant/60">Mon</div>
+<div class="text-center pb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-on-surface-variant/60">Tue</div>
+<div class="text-center pb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-on-surface-variant/60">Wed</div>
+<div class="text-center pb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-on-surface-variant/60">Thu</div>
+<div class="text-center pb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-on-surface-variant/60">Fri</div>
+<div class="text-center pb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-on-surface-variant/60">Sat</div>
+<!-- Calendar Dates with Heatmap intensities -->
+<!-- Empty slots for alignment -->
+<div class="aspect-square"></div> <!-- Sep 29 -->
+<div class="aspect-square"></div> <!-- Sep 30 -->
+<!-- Oct 1 - Oct 31 -->
+<div class="aspect-square bg-primary/10 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">1</div>
+<div class="aspect-square bg-primary/20 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">2</div>
+<div class="aspect-square bg-primary/40 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">3</div>
+<div class="aspect-square bg-primary/10 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">4</div>
+<div class="aspect-square bg-primary/60 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">5</div>
+<div class="aspect-square bg-primary/80 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">6</div>
+<div class="aspect-square bg-primary/30 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">7</div>
+<div class="aspect-square bg-primary/10 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">8</div>
+<div class="aspect-square bg-primary/90 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">9</div>
+<div class="aspect-square bg-primary/50 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">10</div>
+<div class="aspect-square bg-primary/20 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">11</div>
+<div class="aspect-square bg-primary/70 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">12</div>
+<div class="aspect-square bg-primary/40 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">13</div>
+<div class="aspect-square bg-primary/10 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">14</div>
+<div class="aspect-square bg-primary/80 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">15</div>
+<div class="aspect-square bg-primary/30 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">16</div>
+<div class="aspect-square bg-primary/20 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">17</div>
+<div class="aspect-square bg-primary/60 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">18</div>
+<div class="aspect-square bg-primary/90 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">19</div>
+<div class="aspect-square bg-primary/20 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">20</div>
+<div class="aspect-square bg-primary/40 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">21</div>
+<div class="aspect-square bg-primary/10 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">22</div>
+<div class="aspect-square bg-primary/50 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">23</div>
+<!-- Selected Day: Oct 24 -->
+<div class="aspect-square bg-primary rounded-xl flex items-center justify-center font-label text-sm text-white ring-4 ring-primary/20 ring-offset-2 ring-offset-surface scale-110 shadow-lg relative z-10 transition-all">24</div>
+<div class="aspect-square bg-primary/20 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">25</div>
+<div class="aspect-square bg-primary/10 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">26</div>
+<div class="aspect-square bg-primary/30 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">27</div>
+<div class="aspect-square bg-primary/60 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">28</div>
+<div class="aspect-square bg-primary/40 rounded-xl flex items-center justify-center font-label text-sm text-white transition-all hover:scale-95 cursor-pointer">29</div>
+<div class="aspect-square bg-primary/20 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">30</div>
+<div class="aspect-square bg-primary/10 rounded-xl flex items-center justify-center font-label text-sm text-primary transition-all hover:scale-95 cursor-pointer">31</div>
+</div>
+</section>
+<!-- Selected Day Summary: Bento Layout -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Score Card -->
+<div class="md:col-span-4 bg-surface-container-lowest rounded-xl p-8 flex flex-col items-center justify-center text-center shadow-[0_4px_40px_rgba(27,28,26,0.04)]">
+<p class="font-label text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-6">Daily Score</p>
+<div class="relative flex items-center justify-center">
+<svg class="w-32 h-32 transform -rotate-90">
+<circle class="text-surface-container" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="29.1" stroke-width="8"></circle>
+</svg>
+<span class="absolute font-headline text-4xl text-on-surface">92%</span>
+</div>
+<p class="mt-6 font-body text-sm text-on-surface-variant italic">Peak performance reached.</p>
+</div>
+<!-- Highlights Card -->
+<div class="md:col-span-8 bg-surface-container-low rounded-xl p-8">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline text-2xl text-on-surface">Highlights of the 24th</h3>
+<span class="font-label text-[10px] font-bold uppercase tracking-widest px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed rounded-full">Focused</span>
+</div>
+<div class="space-y-6">
+<div class="flex items-center gap-4 group">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">timer</span>
+</div>
+<div class="flex-1">
+<p class="font-body text-base text-on-surface font-semibold">Deep Work: 4h</p>
+<p class="font-body text-xs text-on-surface-variant">Uninterrupted flow state session</p>
+</div>
+<div class="h-px flex-1 bg-outline-variant/20 hidden md:block"></div>
+</div>
+<div class="flex items-center gap-4 group">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+</div>
+<div class="flex-1">
+<p class="font-body text-base text-on-surface font-semibold">Journaled</p>
+<p class="font-body text-xs text-on-surface-variant">Morning reflection completed</p>
+</div>
+<div class="h-px flex-1 bg-outline-variant/20 hidden md:block"></div>
+</div>
+<div class="flex items-center gap-4 group">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<div class="flex-1">
+<p class="font-body text-base text-on-surface font-semibold">Met Hydration Goal</p>
+<p class="font-body text-xs text-on-surface-variant">3L intake throughout the day</p>
+</div>
+<div class="h-px flex-1 bg-outline-variant/20 hidden md:block"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Monthly Trends - Asymmetric Accent -->
+<section class="mt-12 mb-8">
+<div class="bg-primary p-8 rounded-xl flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
+<div class="absolute -right-10 -bottom-10 w-48 h-48 bg-primary-container rounded-full opacity-50 blur-3xl"></div>
+<div class="relative z-10 text-white max-w-md">
+<p class="font-label text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 mb-2">Trend Analysis</p>
+<h4 class="font-headline text-3xl mb-4">You are most productive on Thursdays.</h4>
+<p class="font-body text-sm opacity-90 leading-relaxed">Based on your activity heatmap, your focus peaks between 9 AM and 1 PM. Schedule your high-cognitive tasks during this window next week.</p>
+</div>
+<button class="relative z-10 px-8 py-3 bg-white text-primary rounded-xl font-label text-[11px] font-bold uppercase tracking-widest transition-transform hover:scale-105 active:scale-95 shadow-xl">
+                    View Monthly Report
+                </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-2 bg-[#fbf9f5]/80 backdrop-blur-md z-50 rounded-t-xl shadow-[0_-4px_40px_rgba(27,28,26,0.04)]">
+<div class="flex flex-col items-center justify-center text-[#0f5238]/60 py-2 px-4 transition-transform active:scale-90 hover:text-[#0f5238]">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-widest">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#0f5238]/60 py-2 px-4 transition-transform active:scale-90 hover:text-[#0f5238]">
+<span class="material-symbols-outlined mb-1">auto_stories</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-widest">Journal</span>
+</div>
+<!-- Active Item: Calendar -->
+<div class="flex flex-col items-center justify-center bg-[#2d6a4f] text-white rounded-xl py-2 px-4 transition-transform active:scale-90">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-widest">Calendar</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#0f5238]/60 py-2 px-4 transition-transform active:scale-90 hover:text-[#0f5238]">
+<span class="material-symbols-outlined mb-1">event_repeat</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-widest">Scheduler</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#0f5238]/60 py-2 px-4 transition-transform active:scale-90 hover:text-[#0f5238]">
+<span class="material-symbols-outlined mb-1">settings</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-widest">Settings</span>
+</div>
+</nav>
+</body></html>

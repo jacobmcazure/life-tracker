@@ -28,52 +28,22 @@ import CalendarScreen from './src/screens/CalendarScreen';
 import SchedulerScreen from './src/screens/SchedulerScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import TemplateEditorScreen from './src/screens/TemplateEditorScreen';
+import BottomTabBar from './src/components/BottomTabBar';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function MainTabs() {
-  const { colors } = useTheme();
   return (
     <Tab.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.surface,
-          elevation: 0,
-          shadowOpacity: 0,
-        },
-        headerTintColor: colors.primary,
-        headerTitleStyle: {
-          fontFamily: 'Newsreader_600SemiBold_Italic',
-          fontSize: 22,
-          color: colors.primary,
-        },
-        tabBarStyle: {
-          backgroundColor: colors.surface + 'CC',
-          borderTopWidth: 0,
-          elevation: 0,
-          position: 'absolute',
-          paddingTop: 4,
-        },
-        tabBarActiveTintColor: colors.primaryContainer,
-        tabBarInactiveTintColor: colors.onSurface + 'B3',
-        tabBarLabelStyle: {
-          fontFamily: 'Manrope_600SemiBold',
-          fontSize: 11,
-          letterSpacing: 0.5,
-          textTransform: 'uppercase',
-        },
-      }}
+      tabBar={(props) => <BottomTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Journal" component={JournalScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
       <Tab.Screen name="Scheduler" component={SchedulerScreen} />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ headerShown: false }}
-      />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
 }
@@ -85,9 +55,9 @@ function AppNavigator() {
       <StatusBar style="dark" />
       <Stack.Navigator
         screenOptions={{
-          headerStyle: { backgroundColor: colors.headerBg },
-          headerTintColor: colors.headerText,
-          headerTitleStyle: { fontWeight: '700' },
+          headerStyle: { backgroundColor: colors.surface, elevation: 0, shadowOpacity: 0 },
+          headerTintColor: colors.primary,
+          headerTitleStyle: { fontFamily: 'Newsreader_600SemiBold_Italic', fontSize: 22, fontWeight: undefined },
         }}
       >
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
